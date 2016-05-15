@@ -1,13 +1,11 @@
-/// <reference path="./interfaces.d.ts" />
-
-let dir = {
+"use strict";
+var dir = {
     a: "├──",
     b: "└──",
     c: "│",
     d: ""
 };
-
-let deatultOptions: ILoggerSettings = {
+var deatultOptions = {
     request: {
         bindings: {
             activated: false,
@@ -31,28 +29,26 @@ let deatultOptions: ILoggerSettings = {
         }
     }
 };
-
-function consoleRenderer(out: string) {
+function consoleRenderer(out) {
     console.log(out);
 }
-
-function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void) {
-
-    let logger = function (next: (context: inversify.IContext) => any) {
-        return function (context: inversify.IContext) {
-
-            if (settings === undefined) { settings = deatultOptions; };
-            if (renderer === undefined) { renderer = consoleRenderer; };
-
-            let result = next(context);
+function makeLoggerMiddleware(settings, renderer) {
+    var logger = function (next) {
+        return function (context) {
+            if (settings === undefined) {
+                settings = deatultOptions;
+            }
+            ;
+            if (renderer === undefined) {
+                renderer = consoleRenderer;
+            }
+            ;
+            var result = next(context);
             console.log(dir);
             return result;
-
         };
     };
-
     return logger;
-
 }
-
-export default makeLoggerMiddleware;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = makeLoggerMiddleware;
