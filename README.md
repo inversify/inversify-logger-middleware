@@ -53,7 +53,7 @@ function consoleRenderer(out: string) {
 
 The following code snippet uses custom settings and a string renderer instead of the default console renderer.
 
-```
+```ts
 let options: ILoggerSettings = {
     request: {
         serviceIdentifier: true,
