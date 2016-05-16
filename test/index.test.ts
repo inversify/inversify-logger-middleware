@@ -8,7 +8,7 @@ import * as sinon from "sinon";
 
 describe("makeLoggerMiddleware", () => {
 
-    let sandbox: Sinon.SinonSandbox;
+    let sandbox: sinon.SinonSandbox;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
