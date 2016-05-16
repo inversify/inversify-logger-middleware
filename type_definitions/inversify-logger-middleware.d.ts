@@ -36,7 +36,7 @@ declare namespace inversifyLoggerMiddleware {
         metadata?: boolean;
     }
 
-    export default function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void): 
+    export default function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void):
         (next: (context: any) => any) => (context: any) => any;
 
 }
