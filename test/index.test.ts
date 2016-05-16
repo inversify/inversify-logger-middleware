@@ -96,6 +96,10 @@ describe("makeLoggerMiddleware", () => {
         let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
         // expect(consoleLogStub.callCount).eql(1);
+
+        let samurai = kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
+        expect(samurai.fight()).eql("Katana");
+
         expect(log).eql("");
 
     });

@@ -94,6 +94,8 @@ describe("makeLoggerMiddleware", function () {
         kernel.applyMiddleware(logger);
         var ninja = kernel.getTagged("IWarrior", "canSneak", true);
         chai_1.expect(ninja.fight()).eql("Shuriken");
+        var samurai = kernel.getTagged("IWarrior", "canSneak", false);
+        chai_1.expect(samurai.fight()).eql("Katana");
         chai_1.expect(log).eql("");
     });
     it("Should be able use custom settings", function () {

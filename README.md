@@ -20,55 +20,110 @@ A console logger middleware for InversifyJS
 This middleware will display the InversifyJS resolution plan in console in the following format:
 
 ```ts
-└── plan
-    └── item:0
-        └── serviceIdentifier: IWarrior
-        └── bindings:
-            └── item:0
-                └── activated: false
-                └── cache: null
-                └── dynamicValue: undefined
-                └── factory: null
-                └── implementationType: Ninja
-                └── onActivation: null
-                └── provider: null
-                └── scope: 0
-                └── serviceIdentifier: IWarrior
-                └── type: 1
-        └── target
-            └── name: undefined
-            └── serviceIdentifier: IWarrior
-            └── metadata
-                └── item:0
-                    └── key: canSneak
-                    └── value: true
-        └── childRequests:
-            └── item:0
-                └── serviceIdentifier: IWeapon
-                └── bindings:
-                    └── item:0
-                        └── activated: false
-                        └── cache: null
-                        └── dynamicValue: undefined
-                        └── factory: null
-                        └── implementationType: Shuriken
-                        └── onActivation: null
-                        └── provider: null
-                        └── scope: 0
-                        └── serviceIdentifier: IWeapon
-                        └── type: 1
-                └── target
-                    └── name: shuriken
-                    └── serviceIdentifier: IWeapon
-                    └── metadata
-                        └── item:0
-                            └── key: name
-                            └── value: shuriken
-                        └── item:1
-                            └── key: inject
-                            └── value: IWeapon
+// kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
 
- Time: 0.46 millisecond/s.
+└── plan
+    └── item : 0
+        └── serviceIdentifier : IWarrior
+        └── bindings
+            └── item : 0
+                └── type : Instance
+                └── serviceIdentifier : IWarrior
+                └── implementationType : Ninja
+                └── activated : false
+                └── cache : null
+                └── dynamicValue : null
+                └── factory : null
+                └── onActivation : null
+                └── provider : null
+                └── scope : Transient
+        └── target
+            └── name : undefined
+            └── serviceIdentifier : IWarrior
+            └── metadata
+                └── item : 0
+                    └── key : canSneak
+                    └── value : true
+        └── childRequests
+            └── item : 0
+                └── serviceIdentifier : IWeapon
+                └── bindings
+                    └── item : 0
+                        └── type : Instance
+                        └── serviceIdentifier : IWeapon
+                        └── implementationType : Shuriken
+                        └── activated : false
+                        └── cache : null
+                        └── dynamicValue : null
+                        └── factory : null
+                        └── onActivation : null
+                        └── provider : null
+                        └── scope : Transient
+                └── target
+                    └── name : shuriken
+                    └── serviceIdentifier : IWeapon
+                    └── metadata
+                        └── item : 0
+                            └── key : name
+                            └── value : shuriken
+                        └── item : 1
+                            └── key : inject
+                            └── value : IWeapon
+
+ Time: 0.37 millisecond/s.
+```
+```ts
+// kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
+
+└── plan
+    └── item : 0
+        └── serviceIdentifier : IWarrior
+        └── bindings
+            └── item : 0
+                └── type : Instance
+                └── serviceIdentifier : IWarrior
+                └── implementationType : Samurai
+                └── activated : false
+                └── cache : null
+                └── dynamicValue : null
+                └── factory : null
+                └── onActivation : null
+                └── provider : null
+                └── scope : Transient
+        └── target
+            └── name : undefined
+            └── serviceIdentifier : IWarrior
+            └── metadata
+                └── item : 0
+                    └── key : canSneak
+                    └── value : false
+        └── childRequests
+            └── item : 0
+                └── serviceIdentifier : IWeapon
+                └── bindings
+                    └── item : 0
+                        └── type : Instance
+                        └── serviceIdentifier : IWeapon
+                        └── implementationType : Katana
+                        └── activated : false
+                        └── cache : null
+                        └── dynamicValue : null
+                        └── factory : null
+                        └── onActivation : null
+                        └── provider : null
+                        └── scope : Transient
+                └── target
+                    └── name : katana
+                    └── serviceIdentifier : IWeapon
+                    └── metadata
+                        └── item : 0
+                            └── key : name
+                            └── value : katana
+                        └── item : 1
+                            └── key : inject
+                            └── value : IWeapon
+
+ Time: 0.08 millisecond/s.
 ```
 
 You can configure which elements of the resolution plan are being desplayed.

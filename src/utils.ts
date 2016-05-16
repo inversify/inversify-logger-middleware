@@ -55,7 +55,7 @@ function makePropertyLogger(indentationForDepth: string) {
             line = `${line}${indentation}`;
         }
 
-        line = `${line}${tree.item} ${key}`;
+        line = `${line}${tree.item} ${cyan(key)}`;
 
         if (value !== undefined) {
             line = `${line} : ${yellow(value.toString())}`;
@@ -65,4 +65,4 @@ function makePropertyLogger(indentationForDepth: string) {
     };
 }
 
-export { getIndentationForDepth, getTime, getTimeDiference, cyan, yellow, makePropertyLogger };
+export { getIndentationForDepth, getTime, getTimeDiference, makePropertyLogger };

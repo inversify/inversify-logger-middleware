@@ -379,6 +379,34 @@ module.exports = (function () {
 },{"_process":6}],9:[function(require,module,exports){
 "use strict";
 var utils_1 = require("./utils");
+function scopeToString(scope) {
+    switch (scope) {
+        case 1:
+            return "Singleton";
+        case 0:
+        default:
+            return "Transient";
+    }
+}
+function bindingTypeToString(type) {
+    switch (type) {
+        case 1:
+            return "Instance";
+        case 2:
+            return "ConstantValue";
+        case 3:
+            return "DynamicValue";
+        case 4:
+            return "Constructor";
+        case 5:
+            return "Factory";
+        case 6:
+            return "Provider";
+        case 0:
+        default:
+            return "Invalid";
+    }
+}
 function getBindingLogEntry(log, options, index, binding, indentationForDepth) {
     var logProperty = utils_1.makePropertyLogger(indentationForDepth);
     log = logProperty(log, 0, "item", index);
@@ -391,7 +419,21 @@ function getBindingLogEntry(log, options, index, binding, indentationForDepth) {
         var _bindings = options.request.bindings;
         var _binding = binding;
         if (_bindings[prop]) {
-            var value = (prop === "implementationType") ? (_binding[prop].name || undefined) : _binding[prop];
+            var value = _binding[prop];
+            switch (prop) {
+                case "scope":
+                    value = scopeToString(_binding[prop]);
+                    break;
+                case "type":
+                    value = bindingTypeToString(_binding[prop]);
+                    break;
+                case "implementationType":
+                    value = (_binding[prop].name || "undefined");
+                    break;
+                default:
+                    value = _binding[prop];
+                    break;
+            }
             value = (value === null || value === undefined) ? "null" : value;
             log = logProperty(log, 1, prop, value);
         }
@@ -539,9 +581,7 @@ exports.default = getTargetLogEntry;
 var constants_1 = require("./constants");
 var chalk = require("chalk");
 var cyan = chalk.cyan;
-exports.cyan = cyan;
 var yellow = chalk.yellow;
-exports.yellow = yellow;
 function getIndentationForDepth(depth) {
     var indentationForDepth = constants_1.indentation;
     for (var i = depth; i--; i >= 0) {
@@ -576,7 +616,7 @@ function makePropertyLogger(indentationForDepth) {
         for (var i = tabCount; i > 0; i--) {
             line = "" + line + constants_1.indentation;
         }
-        line = "" + line + constants_1.tree.item + " " + key;
+        line = "" + line + constants_1.tree.item + " " + cyan(key);
         if (value !== undefined) {
             line = line + " : " + yellow(value.toString());
         }
