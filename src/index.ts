@@ -6,7 +6,7 @@ import { tree } from "./constants";
 import getRequestLogEntry from "./request_logger";
 import { getTime, getTimeDiference } from "./utils";
 
-function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void) {
+function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void): inversify.IMiddleware {
 
     let logger = function (next: (context: inversify.IContext) => any) {
         return function (context: inversify.IContext) {

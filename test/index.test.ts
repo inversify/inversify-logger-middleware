@@ -77,6 +77,7 @@ describe("makeLoggerMiddleware", () => {
         k.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
     };
 
+    // Takes object (loggerOutput) instead of primitive (string) to share reference
     let makeStringRenderer = function (loggerOutput: { content: string }) {
         return function (out: string) {
             loggerOutput.content = out;

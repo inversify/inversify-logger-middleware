@@ -16,6 +16,16 @@ A console logger middleware for InversifyJS
 
 **Coming soon! Please [contact us on Gitter](https://gitter.im/inversify/InversifyJS) If you would like to help us to develop one of the [official InversifyJS projects](https://github.com/inversify).**
 
+### Installation
+You can install `inversify-logger-middleware` using npm:
+```
+$ npm install inversify-logger-middleware
+```
+if you are workiong with TypeScript you will need the following .d.ts files:
+
+/// <reference path="node_modules/inversify-logger-middleware/type_definitions/inversify-logger-middleware.d.ts" />
+/// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
+
 ### Motivation
 Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
 ```ts
@@ -26,59 +36,6 @@ kernel.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
 ```
 This middleware will display the InversifyJS resolution plan in console in the following format.
 
-```ts
-// kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
-
-└── plan
-    └── item : 0
-        └── serviceIdentifier : IWarrior
-        └── bindings
-            └── item : 0
-                └── type : Instance
-                └── serviceIdentifier : IWarrior
-                └── implementationType : Ninja
-                └── activated : false
-                └── cache : null
-                └── dynamicValue : null
-                └── factory : null
-                └── onActivation : null
-                └── provider : null
-                └── scope : Transient
-        └── target
-            └── name : undefined
-            └── serviceIdentifier : IWarrior
-            └── metadata
-                └── item : 0
-                    └── key : canSneak
-                    └── value : true
-        └── childRequests
-            └── item : 0
-                └── serviceIdentifier : IWeapon
-                └── bindings
-                    └── item : 0
-                        └── type : Instance
-                        └── serviceIdentifier : IWeapon
-                        └── implementationType : Shuriken
-                        └── activated : false
-                        └── cache : null
-                        └── dynamicValue : null
-                        └── factory : null
-                        └── onActivation : null
-                        └── provider : null
-                        └── scope : Transient
-                └── target
-                    └── name : shuriken
-                    └── serviceIdentifier : IWeapon
-                    └── metadata
-                        └── item : 0
-                            └── key : name
-                            └── value : shuriken
-                        └── item : 1
-                            └── key : inject
-                            └── value : IWeapon
-
- Time: 0.37 millisecond/s.
-```
 ```ts
 // kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
 
@@ -149,26 +106,27 @@ The default options are the following:
 ```ts
 let deatultOptions: ILoggerSettings = {
     request: {
-        serviceIdentifier: true,
         bindings: {
             activated: false,
-            serviceIdentifier: false,
-            implementationType: true,
-            factory: false,
-            provider: false,
-            constraint: false,
-            onActivation: false,
             cache: false,
+            constraint: false,
             dynamicValue: false,
+            factory: false,
+            implementationType: true,
+            onActivation: false,
+            provider: false,
             scope: false,
+            serviceIdentifier: false,
             type: false
         },
+        serviceIdentifier: true,
         target: {
-            serviceIdentifier: false,
+            metadata: true,
             name: false,
-            metadata: false,
+            serviceIdentifier: false
         }
-    }
+    },
+    time: true
 };
 ```
 
@@ -197,16 +155,17 @@ let options: ILoggerSettings = {
     }
 };
 
-let makeStringRenderer = function (str: string) {
+// Takes object (loggerOutput) instead of primitive (string) to share reference
+let makeStringRenderer = function (loggerOutput: { content: string }) {
     return function (out: string) {
-        str = out;
+        loggerOutput.content = out;
     };
-}
+};
 
-let output = "";
-let stringRenderer = makeStringRenderer(output);
 
-let logger = makeLoggerMiddleware(options, stringRenderer);
+let loggerOutput = { content : "" };
+let stringRenderer = makeStringRenderer(loggerOutput);
+let logger = makeLoggerMiddleware(null, stringRenderer);
 ```
 
 ### Applying the middleware

@@ -1,6 +1,6 @@
 {
   "name": "inversify-logger-middleware",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "A basic logger middleware for InversifyJS",
   "main": "lib/index.js",
   "scripts": {
@@ -52,8 +52,5 @@
     "tslint": "^3.10.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
-  },
-  "peerDependencies": {
-    "typings": "^1.0.1"
   }
 }
