@@ -17,7 +17,7 @@ A console logger middleware for InversifyJS
 **Coming soon! Please [contact us on Gitter](https://gitter.im/inversify/InversifyJS) If you would like to help us to develop one of the [official InversifyJS projects](https://github.com/inversify).**
 
 ### Motivation
-Lets imagine that we have already configured a InversifyJS Kernel and the logger middleware using the fillowing bindings:
+Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
 ```ts
 kernel.bind<IWeapon>("IWeapon").to(Katana).whenInjectedInto(Samurai);
 kernel.bind<IWeapon>("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
