@@ -16,6 +16,65 @@ A console logger middleware for InversifyJS
 
 **Coming soon! Please [contact us on Gitter](https://gitter.im/inversify/InversifyJS) If you would like to help us to develop one of the [official InversifyJS projects](https://github.com/inversify).**
 
+### Motivation
+This middleware will display the InversifyJS resolution plan in console in the following format:
+
+```ts
+└── plan
+    └── item:0
+        └── serviceIdentifier: IWarrior
+        └── bindings:
+            └── item:0
+                └── activated: false
+                └── cache: null
+                └── dynamicValue: undefined
+                └── factory: null
+                └── implementationType: Ninja
+                └── onActivation: null
+                └── provider: null
+                └── scope: 0
+                └── serviceIdentifier: IWarrior
+                └── type: 1
+        └── target
+            └── name: undefined
+            └── serviceIdentifier: IWarrior
+            └── metadata
+                └── item:0
+                    └── key: canSneak
+                    └── value: true
+        └── childRequests:
+            └── item:0
+                └── serviceIdentifier: IWeapon
+                └── bindings:
+                    └── item:0
+                        └── activated: false
+                        └── cache: null
+                        └── dynamicValue: undefined
+                        └── factory: null
+                        └── implementationType: Shuriken
+                        └── onActivation: null
+                        └── provider: null
+                        └── scope: 0
+                        └── serviceIdentifier: IWeapon
+                        └── type: 1
+                └── target
+                    └── name: shuriken
+                    └── serviceIdentifier: IWeapon
+                    └── metadata
+                        └── item:0
+                            └── key: name
+                            └── value: shuriken
+                        └── item:1
+                            └── key: inject
+                            └── value: IWeapon
+
+ Time: 0.46 millisecond/s.
+```
+
+You can configure which elements of the resolution plan are being desplayed.
+
+This kind of information can help you during the development of applications with InersifyJS.
+
 ### Default settings and renderer
 You can create a logger using the default settings as follows:
 

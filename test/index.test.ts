@@ -1,11 +1,22 @@
 /// <reference path="../src/interfaces.d.ts" />
 
-import { Kernel, inject, injectable } from "inversify";
+import { Kernel, inject, injectable, targetName } from "inversify";
 import makeLoggerMiddleware from "../src/index";
 import { expect } from "chai";
 import "reflect-metadata";
+import * as sinon from "sinon";
 
 describe("makeLoggerMiddleware", () => {
+
+    let sandbox: Sinon.SinonSandbox;
+
+    beforeEach(() => {
+        sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     interface IWeapon {
         name: string;
@@ -34,8 +45,8 @@ describe("makeLoggerMiddleware", () => {
     @injectable()
     class Ninja implements IWarrior {
         private _weapon: IWeapon;
-        public constructor(@inject("IWeapon") weapon: IWeapon) {
-            this._weapon = weapon;
+        public constructor(@inject("IWeapon")  @targetName("shuriken") shuriken: IWeapon) {
+            this._weapon = shuriken;
         }
         public fight() {
             return this._weapon.name;
@@ -48,8 +59,8 @@ describe("makeLoggerMiddleware", () => {
     @injectable()
     class Samurai implements IWarrior {
         private _weapon: IWeapon;
-        public constructor(@inject("IWeapon") weapon: IWeapon) {
-            this._weapon = weapon;
+        public constructor(@inject("IWeapon") @targetName("katana") katana: IWeapon) {
+            this._weapon = katana;
         }
         public fight() {
             return this._weapon.name;
@@ -59,27 +70,46 @@ describe("makeLoggerMiddleware", () => {
         }
     }
 
+    let module = (k: inversify.IKernel) => {
+        k.bind<IWeapon>("IWeapon").to(Katana).whenInjectedInto(Samurai);
+        k.bind<IWeapon>("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
+        k.bind<IWarrior>("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
+        k.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
+    };
+
     it("Should be able use default settings", () => {
 
-        // TODO
+        let kernel = new Kernel();
+        kernel.load(module);
+
+        let log = "";
+/*
+        let consoleLogStub = sandbox.stub(console, "log", function(...args: any[]) {
+            args.forEach((arg) => {
+                log += arg;
+            });
+        });
+*/
+        let logger = makeLoggerMiddleware();
+        kernel.applyMiddleware(logger);
+
+        let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
+        expect(ninja.fight()).eql("Shuriken");
+        // expect(consoleLogStub.callCount).eql(1);
+        expect(log).eql("");
 
     });
 
     it("Should be able use custom settings", () => {
 
         let kernel = new Kernel();
-
-        kernel.bind<IWeapon>("IWeapon").to(Katana).whenInjectedInto(Samurai);
-        kernel.bind<IWeapon>("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
-        kernel.bind<IWarrior>("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
-        kernel.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
+        kernel.load(module);
 
         let options: ILoggerSettings = {
             request: {
                 bindings: {
                     scope: true
                 },
-                result: true,
                 serviceIdentifier: true
             }
         };
@@ -90,8 +120,8 @@ describe("makeLoggerMiddleware", () => {
             };
         };
 
-        let output = "";
-        let stringRenderer = makeStringRenderer(output);
+        let log = "";
+        let stringRenderer = makeStringRenderer(log);
 
         let logger = makeLoggerMiddleware(options, stringRenderer);
         kernel.applyMiddleware(logger);
@@ -99,12 +129,12 @@ describe("makeLoggerMiddleware", () => {
         let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
-        expect(output).eql("");
+        expect(log).eql("");
 
         let samurai = kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
         expect(samurai.fight()).eql("Katana");
 
-        expect(output).eql("");
+        expect(log).eql("");
 
     });
 

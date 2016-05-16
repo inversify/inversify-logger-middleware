@@ -4,39 +4,11 @@
  * MIT inversify.io/LICENSE
  * https://github.com/inversify/inversify-logger-middleware#readme
  */
-var dir = {
-    a: "├──",
-    b: "└──",
-    c: "│",
-    d: ""
-};
-var deatultOptions = {
-    request: {
-        bindings: {
-            activated: false,
-            cache: false,
-            constraint: false,
-            dynamicValue: false,
-            factory: false,
-            implementationType: false,
-            onActivation: false,
-            provider: false,
-            scope: false,
-            serviceIdentifier: false,
-            type: false
-        },
-        result: false,
-        serviceIdentifier: false,
-        target: {
-            metadata: false,
-            name: false,
-            serviceIdentifier: false
-        }
-    }
-};
-function consoleRenderer(out) {
-    console.log(out);
-}
+import deatultOptions from "./default_settings";
+import consoleRenderer from "./default_renderer";
+import { tree } from "./constants";
+import getRequestLogEntry from "./request_logger";
+import { getTime, getTimeDiference } from "./utils";
 function makeLoggerMiddleware(settings, renderer) {
     var logger = function (next) {
         return function (context) {
@@ -48,8 +20,14 @@ function makeLoggerMiddleware(settings, renderer) {
                 renderer = consoleRenderer;
             }
             ;
+            var start = getTime();
             var result = next(context);
-            console.log(dir);
+            var end = getTime();
+            var log = getRequestLogEntry(tree.item + " plan\n", settings, context.plan.rootRequest, 0, 0);
+            if (settings.time) {
+                log = log + "\n Time: " + getTimeDiference(start, end) + " millisecond/s.\n";
+            }
+            renderer(log);
             return result;
         };
     };

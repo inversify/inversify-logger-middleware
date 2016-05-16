@@ -15,7 +15,15 @@ var inversify_1 = require("inversify");
 var index_1 = require("../src/index");
 var chai_1 = require("chai");
 require("reflect-metadata");
+var sinon = require("sinon");
 describe("makeLoggerMiddleware", function () {
+    var sandbox;
+    beforeEach(function () {
+        sandbox = sinon.sandbox.create();
+    });
+    afterEach(function () {
+        sandbox.restore();
+    });
     var Katana = (function () {
         function Katana() {
             this.name = "Katana";
@@ -37,8 +45,8 @@ describe("makeLoggerMiddleware", function () {
         return Shuriken;
     }());
     var Ninja = (function () {
-        function Ninja(weapon) {
-            this._weapon = weapon;
+        function Ninja(shuriken) {
+            this._weapon = shuriken;
         }
         Ninja.prototype.fight = function () {
             return this._weapon.name;
@@ -48,14 +56,15 @@ describe("makeLoggerMiddleware", function () {
         };
         Ninja = __decorate([
             inversify_1.injectable(),
-            __param(0, inversify_1.inject("IWeapon")), 
+            __param(0, inversify_1.inject("IWeapon")),
+            __param(0, inversify_1.targetName("shuriken")), 
             __metadata('design:paramtypes', [Object])
         ], Ninja);
         return Ninja;
     }());
     var Samurai = (function () {
-        function Samurai(weapon) {
-            this._weapon = weapon;
+        function Samurai(katana) {
+            this._weapon = katana;
         }
         Samurai.prototype.fight = function () {
             return this._weapon.name;
@@ -65,25 +74,36 @@ describe("makeLoggerMiddleware", function () {
         };
         Samurai = __decorate([
             inversify_1.injectable(),
-            __param(0, inversify_1.inject("IWeapon")), 
+            __param(0, inversify_1.inject("IWeapon")),
+            __param(0, inversify_1.targetName("katana")), 
             __metadata('design:paramtypes', [Object])
         ], Samurai);
         return Samurai;
     }());
+    var module = function (k) {
+        k.bind("IWeapon").to(Katana).whenInjectedInto(Samurai);
+        k.bind("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
+        k.bind("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
+        k.bind("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
+    };
     it("Should be able use default settings", function () {
+        var kernel = new inversify_1.Kernel();
+        kernel.load(module);
+        var log = "";
+        var logger = index_1.default();
+        kernel.applyMiddleware(logger);
+        var ninja = kernel.getTagged("IWarrior", "canSneak", true);
+        chai_1.expect(ninja.fight()).eql("Shuriken");
+        chai_1.expect(log).eql("");
     });
     it("Should be able use custom settings", function () {
         var kernel = new inversify_1.Kernel();
-        kernel.bind("IWeapon").to(Katana).whenInjectedInto(Samurai);
-        kernel.bind("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
-        kernel.bind("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
-        kernel.bind("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
+        kernel.load(module);
         var options = {
             request: {
                 bindings: {
                     scope: true
                 },
-                result: true,
                 serviceIdentifier: true
             }
         };
@@ -92,15 +112,15 @@ describe("makeLoggerMiddleware", function () {
                 str = out;
             };
         };
-        var output = "";
-        var stringRenderer = makeStringRenderer(output);
+        var log = "";
+        var stringRenderer = makeStringRenderer(log);
         var logger = index_1.default(options, stringRenderer);
         kernel.applyMiddleware(logger);
         var ninja = kernel.getTagged("IWarrior", "canSneak", true);
         chai_1.expect(ninja.fight()).eql("Shuriken");
-        chai_1.expect(output).eql("");
+        chai_1.expect(log).eql("");
         var samurai = kernel.getTagged("IWarrior", "canSneak", false);
         chai_1.expect(samurai.fight()).eql("Katana");
-        chai_1.expect(output).eql("");
+        chai_1.expect(log).eql("");
     });
 });

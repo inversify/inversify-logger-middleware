@@ -3,14 +3,14 @@
 /// <reference path="../typings/main.d.ts" />
 
 interface ILoggerSettings {
-    request: IRequestLogger;
+    request?: IRequestLogger;
+    time?: boolean;
 }
 
 interface IRequestLogger {
     serviceIdentifier?: boolean;
     bindings?: IBindingLogger;
     target?: ITargetLogger;
-    result?: boolean;
 }
 
 interface IBindingLogger {

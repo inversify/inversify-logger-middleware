@@ -1,40 +1,10 @@
 /// <reference path="./interfaces.d.ts" />
 
-let dir = {
-    a: "├──",
-    b: "└──",
-    c: "│",
-    d: ""
-};
-
-let deatultOptions: ILoggerSettings = {
-    request: {
-        bindings: {
-            activated: false,
-            cache: false,
-            constraint: false,
-            dynamicValue: false,
-            factory: false,
-            implementationType: false,
-            onActivation: false,
-            provider: false,
-            scope: false,
-            serviceIdentifier: false,
-            type: false
-        },
-        result: false,
-        serviceIdentifier: false,
-        target: {
-            metadata: false,
-            name: false,
-            serviceIdentifier: false
-        }
-    }
-};
-
-function consoleRenderer(out: string) {
-    console.log(out);
-}
+import deatultOptions from "./default_settings";
+import consoleRenderer from "./default_renderer";
+import { tree } from "./constants";
+import getRequestLogEntry from "./request_logger";
+import { getTime, getTimeDiference } from "./utils";
 
 function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void) {
 
@@ -44,8 +14,16 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: strin
             if (settings === undefined) { settings = deatultOptions; };
             if (renderer === undefined) { renderer = consoleRenderer; };
 
+            let start =  getTime();
             let result = next(context);
-            console.log(dir);
+            let end = getTime();
+            let log = getRequestLogEntry(`${tree.item} plan\n`, settings, context.plan.rootRequest, 0, 0);
+
+            if (settings.time) {
+                log = `${log}\n Time: ${getTimeDiference(start, end)} millisecond/s.\n`;
+            }
+
+            renderer(log);
             return result;
 
         };
