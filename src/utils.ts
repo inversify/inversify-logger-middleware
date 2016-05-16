@@ -1,6 +1,6 @@
 /// <reference path="./interfaces.d.ts" />
 
-import { indentation } from "./constants";
+import { tree, indentation } from "./constants";
 import * as chalk from "chalk";
 
 let cyan = chalk.cyan;
@@ -46,4 +46,23 @@ function getTimeDiference( start: number, end: number) {
     return formatted;
 }
 
-export { getIndentationForDepth, getTime, getTimeDiference, cyan, yellow };
+function makePropertyLogger(indentationForDepth: string) {
+    return function (log: string, tabCount: number, key: string, value?: any) {
+
+        let line = `${log}${indentationForDepth}`;
+
+        for (let i = tabCount; i > 0; i--) {
+            line = `${line}${indentation}`;
+        }
+
+        line = `${line}${tree.item} ${key}`;
+
+        if (value !== undefined) {
+            line = `${line} : ${yellow(value.toString())}`;
+        }
+
+        return `${line}\n`;
+    };
+}
+
+export { getIndentationForDepth, getTime, getTimeDiference, cyan, yellow, makePropertyLogger };

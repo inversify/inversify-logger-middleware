@@ -1,7 +1,6 @@
 /// <reference path="./interfaces.d.ts" />
 
-import { tree, indentation } from "./constants";
-import { cyan } from "./utils";
+import { makePropertyLogger } from "./utils";
 
 function getBindingLogEntry(
     log: string,
@@ -11,52 +10,25 @@ function getBindingLogEntry(
     indentationForDepth: string
 ) {
 
-    log = `${log}${indentationForDepth}${tree.item} ${cyan("item")}:${index}\n`;
+    let logProperty = makePropertyLogger(indentationForDepth);
 
-    if (options.request.bindings.activated) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("activated")}: ${binding.activated}\n`;
-    }
+    log = logProperty(log, 0, "item", index);
 
-    if (options.request.bindings.cache) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("cache")}: ${binding.cache}\n`;
-    }
+    let props = [
+        "type", "serviceIdentifier", "implementationType",
+        "activated", "cache", "constraint", "dynamicValue",
+        "factory", "onActivation", "provider", "scope"
+    ];
 
-    if (options.request.bindings.constraint) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("constraint")}: ${binding.constraint}\n`;
-    }
-
-    if (options.request.bindings.dynamicValue) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("dynamicValue")}: ${binding.dynamicValue}\n`;
-    }
-
-    if (options.request.bindings.factory) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("factory")}: ${binding.factory}\n`;
-    }
-
-    if (options.request.bindings.implementationType) {
-        let name = (binding.implementationType) ? (<any>binding.implementationType).name : undefined;
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("implementationType")}: ${name}\n`;
-    }
-
-    if (options.request.bindings.onActivation) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("onActivation")}: ${binding.onActivation}\n`;
-    }
-
-    if (options.request.bindings.provider) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("provider")}: ${binding.provider}\n`;
-    }
-
-    if (options.request.bindings.scope) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("scope")}: ${binding.scope}\n`;
-    }
-
-    if (options.request.bindings.serviceIdentifier) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("serviceIdentifier")}: ${binding.serviceIdentifier}\n`;
-    }
-
-    if (options.request.bindings.type) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("type")}: ${binding.type}\n`;
-    }
+    props.forEach((prop) => {
+        let _bindings: any = options.request.bindings;
+        let _binding: any = binding;
+        if (_bindings[prop]) {
+            let value = (prop === "implementationType") ? (_binding[prop].name || undefined) : _binding[prop];
+            value = (value === null || value === undefined) ? "null" : value;
+            log = logProperty(log, 1, prop, value);
+        }
+    });
 
     return log;
 

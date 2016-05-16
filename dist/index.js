@@ -378,48 +378,29 @@ module.exports = (function () {
 
 },{"_process":6}],9:[function(require,module,exports){
 "use strict";
-var constants_1 = require("./constants");
+var utils_1 = require("./utils");
 function getBindingLogEntry(log, options, index, binding, indentationForDepth) {
-    log = "" + log + indentationForDepth + constants_1.tree.item + " item:" + index + "\n";
-    if (options.request.bindings.activated) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " activated: " + binding.activated + "\n";
-    }
-    if (options.request.bindings.cache) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " cache: " + binding.cache + "\n";
-    }
-    if (options.request.bindings.constraint) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " constraint: " + binding.constraint + "\n";
-    }
-    if (options.request.bindings.dynamicValue) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " dynamicValue: " + binding.dynamicValue + "\n";
-    }
-    if (options.request.bindings.factory) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " factory: " + binding.factory + "\n";
-    }
-    if (options.request.bindings.implementationType) {
-        var name_1 = (binding.implementationType) ? binding.implementationType.name : undefined;
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " implementationType: " + name_1 + "\n";
-    }
-    if (options.request.bindings.onActivation) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " onActivation: " + binding.onActivation + "\n";
-    }
-    if (options.request.bindings.provider) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " provider: " + binding.provider + "\n";
-    }
-    if (options.request.bindings.scope) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " scope: " + binding.scope + "\n";
-    }
-    if (options.request.bindings.serviceIdentifier) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " serviceIdentifier: " + binding.serviceIdentifier + "\n";
-    }
-    if (options.request.bindings.type) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " type: " + binding.type + "\n";
-    }
+    var logProperty = utils_1.makePropertyLogger(indentationForDepth);
+    log = logProperty(log, 0, "item", index);
+    var props = [
+        "type", "serviceIdentifier", "implementationType",
+        "activated", "cache", "constraint", "dynamicValue",
+        "factory", "onActivation", "provider", "scope"
+    ];
+    props.forEach(function (prop) {
+        var _bindings = options.request.bindings;
+        var _binding = binding;
+        if (_bindings[prop]) {
+            var value = (prop === "implementationType") ? (_binding[prop].name || undefined) : _binding[prop];
+            value = (value === null || value === undefined) ? "null" : value;
+            log = logProperty(log, 1, prop, value);
+        }
+    });
     return log;
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = getBindingLogEntry;
-},{"./constants":10}],10:[function(require,module,exports){
+},{"./utils":16}],10:[function(require,module,exports){
 "use strict";
 var tree = {
     item: "└──"
@@ -501,14 +482,16 @@ var constants_1 = require("./constants");
 var utils_1 = require("./utils");
 var binding_logger_1 = require("./binding_logger");
 var target_logger_1 = require("./target_logger");
+var utils_2 = require("./utils");
 function getRequestLogEntry(log, options, request, depth, index) {
     var indentationForDepth = utils_1.getIndentationForDepth(depth);
-    log = "" + log + indentationForDepth + constants_1.tree.item + " item:" + index + "\n";
+    var logProperty = utils_2.makePropertyLogger(indentationForDepth);
+    log = logProperty(log, 0, "item", index);
     if (options.request.serviceIdentifier === true) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " serviceIdentifier: " + request.serviceIdentifier + "\n";
+        log = logProperty(log, 1, "serviceIdentifier", request.serviceIdentifier);
     }
     if (options.request.bindings !== undefined) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " bindings:\n";
+        log = logProperty(log, 1, "bindings");
         request.bindings.forEach(function (binding, i) {
             log = binding_logger_1.default(log, options, i, binding, "" + indentationForDepth + constants_1.indentation + constants_1.indentation);
         });
@@ -517,7 +500,7 @@ function getRequestLogEntry(log, options, request, depth, index) {
         log = target_logger_1.default(log, options, request.target, "" + indentationForDepth + constants_1.indentation);
     }
     if (request.childRequests.length > 0) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " childRequests:\n";
+        log = logProperty(log, 1, "childRequests");
     }
     request.childRequests.forEach(function (childRequest, i) {
         log = getRequestLogEntry(log, options, childRequest, (depth + 2), i);
@@ -528,29 +511,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = getRequestLogEntry;
 },{"./binding_logger":9,"./constants":10,"./target_logger":15,"./utils":16}],15:[function(require,module,exports){
 "use strict";
-var constants_1 = require("./constants");
 var utils_1 = require("./utils");
 function getTargetLogEntry(log, options, target, indentationForDepth) {
-    log = "" + log + indentationForDepth + constants_1.tree.item + " target\n";
+    var logProperty = utils_1.makePropertyLogger(indentationForDepth);
+    log = logProperty(log, 0, "target");
     if (options.request.target.name) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " name: " + (target.name.value() || "undefined") + "\n";
+        log = logProperty(log, 1, "name", (target.name.value() || "undefined"));
     }
     if (options.request.target.serviceIdentifier) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " serviceIdentifier: " + target.serviceIdentifier + "\n";
+        log = logProperty(log, 1, "serviceIdentifier", target.serviceIdentifier);
     }
     if (options.request.target.metadata) {
-        log = "" + log + indentationForDepth + constants_1.indentation + constants_1.tree.item + " " + utils_1.cyan("metadata") + "\n";
+        log = logProperty(log, 1, "metadata");
         target.metadata.forEach(function (m, i) {
-            log = "" + log + indentationForDepth + constants_1.indentation + constants_1.indentation + constants_1.tree.item + " item:" + i + "\n";
-            log = "" + log + indentationForDepth + constants_1.indentation + constants_1.indentation + constants_1.indentation + constants_1.tree.item + " key: " + m.key + "\n";
-            log = "" + log + indentationForDepth + constants_1.indentation + constants_1.indentation + constants_1.indentation + constants_1.tree.item + " value: " + m.value + "\n";
+            log = logProperty(log, 2, "item", i);
+            log = logProperty(log, 3, "key", m.key);
+            log = logProperty(log, 3, "value", m.value);
         });
     }
     return log;
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = getTargetLogEntry;
-},{"./constants":10,"./utils":16}],16:[function(require,module,exports){
+},{"./utils":16}],16:[function(require,module,exports){
 (function (process){
 "use strict";
 var constants_1 = require("./constants");
@@ -587,6 +570,20 @@ function getTimeDiference(start, end) {
     return formatted;
 }
 exports.getTimeDiference = getTimeDiference;
+function makePropertyLogger(indentationForDepth) {
+    return function (log, tabCount, key, value) {
+        var line = "" + log + indentationForDepth;
+        for (var i = tabCount; i > 0; i--) {
+            line = "" + line + constants_1.indentation;
+        }
+        line = "" + line + constants_1.tree.item + " " + key;
+        if (value !== undefined) {
+            line = line + " : " + yellow(value.toString());
+        }
+        return line + "\n";
+    };
+}
+exports.makePropertyLogger = makePropertyLogger;
 }).call(this,require('_process'))
 
 },{"./constants":10,"_process":6,"chalk":3}]},{},[13])(13)

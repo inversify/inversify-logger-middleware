@@ -1,7 +1,6 @@
 /// <reference path="./interfaces.d.ts" />
 
-import { tree, indentation } from "./constants";
-import { cyan } from "./utils";
+import { makePropertyLogger } from "./utils";
 
 function getTargetLogEntry(
     log: string,
@@ -10,22 +9,24 @@ function getTargetLogEntry(
     indentationForDepth: string
 ) {
 
-    log = `${log}${indentationForDepth}${tree.item} target\n`;
+    let logProperty = makePropertyLogger(indentationForDepth);
+
+    log = logProperty(log, 0, "target");
 
     if (options.request.target.name) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("name")}: ${target.name.value() || "undefined"}\n`;
+        log = logProperty(log, 1, "name", (target.name.value() || "undefined"));
     }
 
     if (options.request.target.serviceIdentifier) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("serviceIdentifier")}: ${target.serviceIdentifier}\n`;
+        log = logProperty(log, 1, "serviceIdentifier", target.serviceIdentifier);
     }
 
     if (options.request.target.metadata) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("metadata")}\n`;
+        log = logProperty(log, 1, "metadata");
         target.metadata.forEach((m: inversify.IMetadata, i: number) => {
-            log = `${log}${indentationForDepth}${indentation}${indentation}${tree.item} ${cyan("item")}:${i}\n`;
-            log = `${log}${indentationForDepth}${indentation}${indentation}${indentation}${tree.item} ${cyan("key")}: ${m.key}\n`;
-            log = `${log}${indentationForDepth}${indentation}${indentation}${indentation}${tree.item} ${cyan("value")}: ${m.value}\n`;
+            log = logProperty(log, 2, "item", i);
+            log = logProperty(log, 3, "key", m.key);
+            log = logProperty(log, 3, "value", m.value);
         });
     }
 
