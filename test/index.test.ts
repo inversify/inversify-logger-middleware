@@ -77,31 +77,73 @@ describe("makeLoggerMiddleware", () => {
         k.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
     };
 
+    let makeStringRenderer = function (loggerOutput: { content: string }) {
+        return function (out: string) {
+            loggerOutput.content = out;
+        };
+    };
+
     it("Should be able use default settings", () => {
 
         let kernel = new Kernel();
         kernel.load(module);
 
-        let log = "";
-/*
-        let consoleLogStub = sandbox.stub(console, "log", function(...args: any[]) {
-            args.forEach((arg) => {
-                log += arg;
-            });
-        });
-*/
-        let logger = makeLoggerMiddleware();
+        let loggerOutput = { content : "" };
+        let stringRenderer = makeStringRenderer(loggerOutput);
+        let logger = makeLoggerMiddleware(null, stringRenderer);
         kernel.applyMiddleware(logger);
 
         let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
-        // expect(consoleLogStub.callCount).eql(1);
 
-        let samurai = kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
-        expect(samurai.fight()).eql("Katana");
+        let expectedLogEntry =  "└── plan\n" +
+                                "    └── item : 0\n" +
+                                "        └── serviceIdentifier : IWarrior\n" +
+                                "        └── bindings\n" +
+                                "            └── item : 0\n" +
+                                "                └── implementationType : Ninja\n" +
+                                "        └── target\n" +
+                                "            └── metadata\n" +
+                                "                └── item : 0\n" +
+                                "                    └── key : canSneak\n" +
+                                "                    └── value : true\n" +
+                                "        └── childRequests\n" +
+                                "            └── item : 0\n" +
+                                "                └── serviceIdentifier : IWeapon\n" +
+                                "                └── bindings\n" +
+                                "                    └── item : 0\n" +
+                                "                        └── implementationType : Shuriken\n" +
+                                "                └── target\n" +
+                                "                    └── metadata\n" +
+                                "                        └── item : 0\n" +
+                                "                            └── key : name\n" +
+                                "                            └── value : shuriken\n" +
+                                "                        └── item : 1\n" +
+                                "                            └── key : inject\n" +
+                                "                            └── value : IWeapon\n\n" +
+                                " Time: 0.36 millisecond/s.\n";
 
-        expect(log).eql("");
+        let lines = loggerOutput.content.split("└── ")
+                                .map((line) => {
+                                    return line.split("\u001b[33m").join("")
+                                               .split("\u001b[39m").join("");
+                                });
 
+        let expectedLines = expectedLogEntry.split("└── ");
+
+        lines.forEach((line, index) => {
+            if (index < (lines.length - 1)) {
+                expect(line).eql(expectedLines[index]);
+            } else {
+                let timeLine = line.split(" ");
+                let expectedTimeLine = expectedLines[index].split(" ");
+                expect(timeLine[0]).eql(expectedTimeLine[0]);
+                expect(timeLine[1]).eql(expectedTimeLine[1]);
+                expect(timeLine[2]).eql(expectedTimeLine[2]);
+                expect(timeLine[3]).eql(expectedTimeLine[3]);
+                expect(timeLine[5]).eql(expectedTimeLine[5]);
+            }
+        });
     });
 
     it("Should be able use custom settings", () => {
@@ -112,33 +154,112 @@ describe("makeLoggerMiddleware", () => {
         let options: ILoggerSettings = {
             request: {
                 bindings: {
-                    scope: true
+                    activated: true,
+                    cache: true,
+                    constraint: true,
+                    dynamicValue: true,
+                    factory: true,
+                    implementationType: true,
+                    onActivation: true,
+                    provider: true,
+                    scope: true,
+                    serviceIdentifier: true,
+                    type: true
                 },
-                serviceIdentifier: true
-            }
+                serviceIdentifier: true,
+                target: {
+                    metadata: true,
+                    name: true,
+                    serviceIdentifier: true
+                }
+            },
+            time: true
         };
 
-        let makeStringRenderer = function (str: string) {
-            return function (out: string) {
-                str = out;
-            };
-        };
+        let expectedLogEntry =  "└── plan\n" +
+                                "    └── item : 0\n" +
+                                "        └── serviceIdentifier : IWarrior\n" +
+                                "        └── bindings\n" +
+                                "            └── item : 0\n" +
+                                "                └── type : Instance\n" +
+                                "                └── serviceIdentifier : IWarrior\n" +
+                                "                └── implementationType : Ninja\n" +
+                                "                └── activated : false\n" +
+                                "                └── cache : null\n" +
+                                "                └── constraint : function (request) {\n" +
+                                "    return request.target.matchesTag(key)(value);\n" +
+                                "}\n" +
+                                "                └── dynamicValue : null\n" +
+                                "                └── factory : null\n" +
+                                "                └── onActivation : null\n" +
+                                "                └── provider : null\n" +
+                                "                └── scope : Transient\n" +
+                                "        └── target\n" +
+                                "            └── name : undefined\n" +
+                                "            └── serviceIdentifier : IWarrior\n" +
+                                "            └── metadata\n" +
+                                "                └── item : 0\n" +
+                                "                    └── key : canSneak\n" +
+                                "                    └── value : true\n" +
+                                "        └── childRequests\n" +
+                                "            └── item : 0\n" +
+                                "                └── serviceIdentifier : IWeapon\n" +
+                                "                └── bindings\n" +
+                                "                    └── item : 0\n" +
+                                "                        └── type : Instance\n" +
+                                "                        └── serviceIdentifier : IWeapon\n" +
+                                "                        └── implementationType : Shuriken\n" +
+                                "                        └── activated : false\n" +
+                                "                        └── cache : null\n" +
+                                "                        └── constraint : function (request) {\n" +
+                                "            return constraint_helpers_1.typeConstraint(parent)(request.parentRequest);\n" +
+                                "        }\n" +
+                                "                        └── dynamicValue : null\n" +
+                                "                        └── factory : null\n" +
+                                "                        └── onActivation : null\n" +
+                                "                        └── provider : null\n" +
+                                "                        └── scope : Transient\n" +
+                                "                └── target\n" +
+                                "                    └── name : shuriken\n" +
+                                "                    └── serviceIdentifier : IWeapon\n" +
+                                "                    └── metadata\n" +
+                                "                        └── item : 0\n" +
+                                "                            └── key : name\n" +
+                                "                            └── value : shuriken\n" +
+                                "                        └── item : 1\n" +
+                                "                            └── key : inject\n" +
+                                "                            └── value : IWeapon\n\n" +
+                                " Time: 0.13 millisecond/s.\n";
 
-        let log = "";
-        let stringRenderer = makeStringRenderer(log);
-
+        let loggerOutput = { content: "" };
+        let stringRenderer = makeStringRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(options, stringRenderer);
         kernel.applyMiddleware(logger);
 
         let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
-        expect(log).eql("");
+        let lines = loggerOutput.content.split("└── ")
+                                .map((line) => {
+                                    return line.split("\u001b[33m").join("")
+                                               .split("\u001b[39m").join("");
+                                });
 
-        let samurai = kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
-        expect(samurai.fight()).eql("Katana");
+        let expectedLines = expectedLogEntry.split("└── ");
 
-        expect(log).eql("");
+        lines.forEach((line, index) => {
+            if (index < (lines.length - 1)) {
+                expect(line).eql(expectedLines[index]);
+            } else {
+                let timeLine = line.split(" ");
+                let expectedTimeLine = expectedLines[index].split(" ");
+                expect(timeLine[0]).eql(expectedTimeLine[0]);
+                expect(timeLine[1]).eql(expectedTimeLine[1]);
+                expect(timeLine[2]).eql(expectedTimeLine[2]);
+                expect(timeLine[3]).eql(expectedTimeLine[3]);
+                expect(timeLine[5]).eql(expectedTimeLine[5]);
+            }
+        });
 
     });
 

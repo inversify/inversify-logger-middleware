@@ -7,11 +7,11 @@ var utils_1 = require("./utils");
 function makeLoggerMiddleware(settings, renderer) {
     var logger = function (next) {
         return function (context) {
-            if (settings === undefined) {
+            if (settings === undefined || settings === null) {
                 settings = default_settings_1.default;
             }
             ;
-            if (renderer === undefined) {
+            if (renderer === undefined || renderer === null) {
                 renderer = default_renderer_1.default;
             }
             ;

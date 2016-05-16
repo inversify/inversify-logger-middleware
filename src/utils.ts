@@ -3,7 +3,6 @@
 import { tree, indentation } from "./constants";
 import * as chalk from "chalk";
 
-let cyan = chalk.cyan;
 let yellow  = chalk.yellow;
 
 declare var process: any;
@@ -55,7 +54,7 @@ function makePropertyLogger(indentationForDepth: string) {
             line = `${line}${indentation}`;
         }
 
-        line = `${line}${tree.item} ${cyan(key)}`;
+        line = `${line}${tree.item} ${key}`;
 
         if (value !== undefined) {
             line = `${line} : ${yellow(value.toString())}`;

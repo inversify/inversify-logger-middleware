@@ -11,8 +11,8 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: strin
     let logger = function (next: (context: inversify.IContext) => any) {
         return function (context: inversify.IContext) {
 
-            if (settings === undefined) { settings = deatultOptions; };
-            if (renderer === undefined) { renderer = consoleRenderer; };
+            if (settings === undefined || settings === null) { settings = deatultOptions; };
+            if (renderer === undefined || renderer === null) { renderer = consoleRenderer; };
 
             let start =  getTime();
             let result = next(context);

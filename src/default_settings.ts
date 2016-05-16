@@ -3,26 +3,26 @@
 let deatultOptions: ILoggerSettings = {
     request: {
         bindings: {
-            activated: true,
-            cache: true,
+            activated: false,
+            cache: false,
             constraint: false,
-            dynamicValue: true,
-            factory: true,
+            dynamicValue: false,
+            factory: false,
             implementationType: true,
-            onActivation: true,
-            provider: true,
-            scope: true,
-            serviceIdentifier: true,
-            type: true
+            onActivation: false,
+            provider: false,
+            scope: false,
+            serviceIdentifier: false,
+            type: false
         },
         serviceIdentifier: true,
         target: {
             metadata: true,
-            name: true,
-            serviceIdentifier: true
+            name: false,
+            serviceIdentifier: false
         }
     },
-    time: true,
+    time: true
 };
 
 export default deatultOptions;
