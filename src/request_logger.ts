@@ -4,6 +4,7 @@ import { tree, indentation } from "./constants";
 import { getIndentationForDepth } from "./utils";
 import getBindingLogEntry from "./binding_logger";
 import getTargetLogEntry from "./target_logger";
+import { cyan } from "./utils";
 
 function getRequestLogEntry(
     log: string,
@@ -15,15 +16,15 @@ function getRequestLogEntry(
 
     let indentationForDepth = getIndentationForDepth(depth);
 
-    log = `${log}${indentationForDepth}${tree.item} item:${index}\n`;
+    log = `${log}${indentationForDepth}${tree.item} ${cyan("item")}:${index}\n`;
 
     if (options.request.serviceIdentifier === true) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} serviceIdentifier: ${request.serviceIdentifier}\n`;
+        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("serviceIdentifier")}: ${request.serviceIdentifier}\n`;
     }
 
     // bindings
     if (options.request.bindings !== undefined) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} bindings:\n`;
+        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("bindings")}:\n`;
         request.bindings.forEach((binding: inversify.IBinding<any>, i: number) => {
             log = getBindingLogEntry(log, options, i, binding, `${indentationForDepth}${indentation}${indentation}`);
         });
@@ -36,7 +37,7 @@ function getRequestLogEntry(
 
     // child requests
     if (request.childRequests.length > 0) {
-        log = `${log}${indentationForDepth}${indentation}${tree.item} childRequests:\n`;
+        log = `${log}${indentationForDepth}${indentation}${tree.item} ${cyan("childRequests")}:\n`;
     }
 
     request.childRequests.forEach((childRequest, i) => {

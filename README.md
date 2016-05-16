@@ -91,7 +91,7 @@ let deatultOptions: ILoggerSettings = {
         bindings: {
             activated: false,
             serviceIdentifier: false,
-            implementationType: false,
+            implementationType: true,
             factory: false,
             provider: false,
             constraint: false,
@@ -105,8 +105,7 @@ let deatultOptions: ILoggerSettings = {
             serviceIdentifier: false,
             name: false,
             metadata: false,
-        },
-        result: true
+        }
     }
 };
 ```
