@@ -14,8 +14,6 @@
 
 A console logger middleware for [InversifyJS](https://github.com/inversify/InversifyJS).
 
-**Coming soon! Please [contact us on Gitter](https://gitter.im/inversify/InversifyJS) If you would like to help us to develop one of the [official InversifyJS projects](https://github.com/inversify).**
-
 ### Installation
 You can install `inversify-logger-middleware` using npm:
 ```
