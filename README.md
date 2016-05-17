@@ -181,3 +181,7 @@ kernel.applyMiddleware(logger);
 Please refere to the 
 [InversifyJS documentation](https://github.com/inversify/InversifyJS#middleware) 
 to learn more about middleware.
+
+### Demo app
+A sample application can be found at the 
+[inversify-code-samples](https://github.com/inversify/inversify-code-samples/tree/master/inversify-binding-decorators) repository.
