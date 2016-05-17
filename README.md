@@ -22,10 +22,10 @@ You can install `inversify-logger-middleware` using npm:
 $ npm install inversify-logger-middleware
 ```
 if you are workiong with TypeScript you will need the following .d.ts files:
-
+```
 /// <reference path="node_modules/inversify-logger-middleware/type_definitions/inversify-logger-middleware.d.ts" />
 /// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
-
+```
 ### Motivation
 Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
 ```ts
