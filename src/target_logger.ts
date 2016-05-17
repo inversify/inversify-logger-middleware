@@ -21,7 +21,7 @@ function getTargetLogEntry(
         log = logProperty(log, 1, "serviceIdentifier", target.serviceIdentifier);
     }
 
-    if (options.request.target.metadata) {
+    if (options.request.target.metadata && Array.isArray(target.metadata)) {
         log = logProperty(log, 1, "metadata");
         target.metadata.forEach((m: inversify.IMetadata, i: number) => {
             log = logProperty(log, 2, "item", i);
