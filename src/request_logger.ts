@@ -32,7 +32,7 @@ function getRequestLogEntry(
     }
 
     // target
-    if (options.request.target !== undefined) {
+    if (options.request.target !== undefined && request.target !== null) {
         log = getTargetLogEntry(log, options, request.target, `${indentationForDepth}${indentation}`);
     }
 
