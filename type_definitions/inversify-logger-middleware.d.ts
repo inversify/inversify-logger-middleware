@@ -1,7 +1,9 @@
-// Type definitions for inversify 1.0.0-beta.1
+// Type definitions for inversify 1.0.0-beta.2
 // Project: https://github.com/inversify/inversify-logger-middleware
 // Definitions by: inversify <https://github.com/inversify/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
+
+/// <reference path="../node_modules/inversify/type_definitions/inversify/inversify.d.ts"/>
 
 declare namespace inversifyLoggerMiddleware {
 
@@ -36,8 +38,7 @@ declare namespace inversifyLoggerMiddleware {
         metadata?: boolean;
     }
 
-    export default function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void):
-        (next: (context: any) => any) => (context: any) => any;
+    export default function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void): inversify.IMiddleware
 
 }
 
