@@ -19,11 +19,11 @@ A console logger middleware for [InversifyJS](https://github.com/inversify/Inver
 ### Installation
 You can install `inversify-logger-middleware` using npm:
 ```
-$ npm install inversify-logger-middleware
+$ npm install inversify reflect-metadata inversify-logger-middleware inversify-dts
 ```
 if you are workiong with TypeScript you will need the following .d.ts files:
 ```
-/// <reference path="node_modules/inversify-logger-middleware/type_definitions/inversify-logger-middleware.d.ts" />
+/// <reference path="node_modules/inversify-dts/inversify-logger-middleware/inversify-logger-middleware.d.ts" />
 /// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
 ```
 ### Motivation
