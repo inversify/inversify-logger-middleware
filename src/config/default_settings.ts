@@ -1,4 +1,4 @@
-/// <reference path="./interfaces.d.ts" />
+/// <reference path="../interfaces/interfaces.d.ts" />
 
 let deatultOptions: ILoggerSettings = {
     request: {
@@ -11,15 +11,15 @@ let deatultOptions: ILoggerSettings = {
             implementationType: true,
             onActivation: false,
             provider: false,
-            scope: false,
+            scope: true,
             serviceIdentifier: false,
-            type: false
+            type: true
         },
         serviceIdentifier: true,
         target: {
             metadata: true,
-            name: false,
-            serviceIdentifier: false
+            name: true,
+            serviceIdentifier: true
         }
     },
     time: true

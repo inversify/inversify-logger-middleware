@@ -1,29 +1,45 @@
-/// <reference path="./interfaces.d.ts" />
+import deatultOptions from "./config/default_settings";
+import consoleRenderer from "./renderers/console_renderer";
+import requestReducer from "./reducers/request_reducer";
+import textSerializer from "./serializers/text/text_serializer";
+import { getTime, getTimeDiference } from "./utils/utils";
 
-import deatultOptions from "./default_settings";
-import consoleRenderer from "./default_renderer";
-import { tree } from "./constants";
-import getRequestLogEntry from "./request_logger";
-import { getTime, getTimeDiference } from "./utils";
-
-function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: string) => void): inversify.IMiddleware {
+function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: ILogEntry) => void): inversify.IMiddleware {
 
     let logger = function (next: (context: inversify.IContext) => any) {
         return function (context: inversify.IContext) {
 
             if (settings === undefined || settings === null) { settings = deatultOptions; };
             if (renderer === undefined || renderer === null) { renderer = consoleRenderer; };
+            let result: any = null;
 
-            let start =  getTime();
-            let result = next(context);
-            let end = getTime();
-            let log = getRequestLogEntry(`${tree.item} plan\n`, settings, context.plan.rootRequest, 0, 0);
+            let logEntry: ILogEntry = {
+                error: null,
+                exception: null,
+                rootRequest: null,
+                time: null
+            };
 
-            if (settings.time) {
-                log = `${log}\n Time: ${getTimeDiference(start, end)} millisecond/s.\n`;
+            try {
+                let start =  getTime();
+                result = next(context);
+                let end = getTime();
+                logEntry = {
+                    error: false,
+                    exception: null,
+                    rootRequest: requestReducer(context.plan.rootRequest, settings.request),
+                    time: (settings.time) ? getTimeDiference(start, end) : null
+                };
+            } catch (e) {
+                logEntry = {
+                    error: true,
+                    exception: e,
+                    rootRequest: requestReducer(context.plan.rootRequest, settings.request),
+                    time: null
+                };
             }
 
-            renderer(log);
+            renderer(logEntry);
             return result;
 
         };
@@ -33,4 +49,4 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: strin
 
 }
 
-export default makeLoggerMiddleware;
+export { makeLoggerMiddleware, textSerializer };
