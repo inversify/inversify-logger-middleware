@@ -37,8 +37,8 @@ interface ILogEntry {
     error: boolean;
     exception: any;
     multiInject: boolean;
-    requests: any[];
     results: any[];
+    rootRequest: inversify.IRequest;
     serviceIdentifier: any;
     target: any;
     time: string;

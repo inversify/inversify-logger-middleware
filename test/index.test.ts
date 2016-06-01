@@ -1,4 +1,4 @@
-import { Kernel, inject, injectable, targetName } from "inversify";
+import { Kernel, inject, injectable, targetName, multiInject } from "inversify";
 import { makeLoggerMiddleware, textSerializer } from "../src/index";
 import { expect } from "chai";
 import "reflect-metadata";
@@ -275,11 +275,11 @@ describe("makeLoggerMiddleware", () => {
         expect(loggerOutput.entry.error).eql(false);
         expect(loggerOutput.entry.exception).eql(null);
         expect(typeof loggerOutput.entry.time).eql("string");
-        expect(loggerOutput.entry.requests[0].serviceIdentifier).eql("IWarrior");
+        expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("IWarrior");
 
     });
-/*
-    it("Should be able to log errors", () => {
+
+    it("Should be able to log pre-planning errors", () => {
 
         let kernel = new Kernel();
         kernel.load(module);
@@ -292,12 +292,51 @@ describe("makeLoggerMiddleware", () => {
         let ninja = kernel.getTagged<IWarrior>("WRONG_ID", "canSneak", true);
         expect(ninja).eql(undefined);
 
-        expect(loggerOutput.entry.error).eql(false);
-        expect(loggerOutput.entry.exception).eql(null);
-        expect(typeof loggerOutput.entry.time).eql("string");
-        expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("IWarrior");
+        expect(loggerOutput.entry.error).eql(true);
+        expect(loggerOutput.entry.exception.message).eql(`No bindings found for serviceIdentifier: WRONG_ID`);
+        expect(loggerOutput.entry.time).eql(null);
+        expect(loggerOutput.entry.rootRequest).eql(null);
 
     });
-*/
+
+    it("Should be able to log multi-injections", () => {
+
+        let kernel = new Kernel();
+        kernel.load(module);
+        kernel.unbind("IWarrior");
+
+        @injectable()
+        class SamuraiNinja implements IWarrior {
+            private _weapons: IWeapon[];
+            public constructor(@multiInject("IWeapon") weapons: IWeapon[]) {
+                this._weapons = weapons;
+            }
+            public fight() {
+                let s = "";
+                this._weapons.forEach((w: IWeapon) => { s = s + " " + w.name; });
+                return s.trim();
+            }
+            public speak() {
+                return "こんにちは 你好";
+            }
+        }
+
+        kernel.bind<IWarrior>("IWarrior").to(SamuraiNinja);
+
+        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let objRenderer = makeObjRenderer(loggerOutput);
+        let logger = makeLoggerMiddleware(null, objRenderer);
+        kernel.applyMiddleware(logger);
+
+        let samuraiNinja = kernel.get<IWarrior>("IWarrior");
+        expect(samuraiNinja.fight()).eql("Katana Shuriken");
+        expect(loggerOutput.entry.error).eql(false);
+        expect(typeof loggerOutput.entry.time).eql("string");
+        expect(loggerOutput.entry.rootRequest.childRequests.length).eql(1);
+        expect(loggerOutput.entry.rootRequest.childRequests[0].childRequests.length).eql(2);
+        expect(loggerOutput.entry.rootRequest.childRequests[0].childRequests[0].bindings[0].implementationType).eql(Katana);
+        expect(loggerOutput.entry.rootRequest.childRequests[0].childRequests[1].bindings[0].implementationType).eql(Shuriken);
+
+    });
 
 });

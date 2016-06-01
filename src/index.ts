@@ -17,8 +17,8 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: ILogE
                 error: false,
                 exception: null,
                 multiInject: args.multiInject,
-                requests: [],
                 results: [],
+                rootRequest: null,
                 serviceIdentifier: args.serviceIdentifier,
                 target: args.target,
                 time: null
@@ -26,7 +26,7 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: ILogE
 
             let nextContextInterceptor = args.contextInterceptor;
             args.contextInterceptor = (context: inversify.IContext) => {
-                logEntry.requests.push(requestReducer(context.plan.rootRequest, settings.request));
+                logEntry.rootRequest = requestReducer(context.plan.rootRequest, settings.request);
                 return nextContextInterceptor(context);
             };
 
@@ -43,7 +43,7 @@ function makeLoggerMiddleware(settings?: ILoggerSettings, renderer?: (out: ILogE
             }
 
             renderer(logEntry);
-            return results;
+            return results || [];
 
         };
     };
