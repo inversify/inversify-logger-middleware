@@ -7,6 +7,8 @@
     "sinon": "registry:npm/sinon#1.16.0+20160427193336"
   },
   "globalDependencies": {
-    "mocha": "registry:dt/mocha#2.2.5+20160317120654"
+    "bluebird": "registry:dt/bluebird#2.0.0+20160319051630",
+    "mocha": "registry:dt/mocha#2.2.5+20160317120654",
+    "q": "registry:dt/q#0.0.0+20160417152954"
   }
 }

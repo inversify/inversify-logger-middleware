@@ -279,6 +279,27 @@ describe("makeLoggerMiddleware", () => {
 
     });
 
+    it("Should be able to log planning errors", () => {
+
+        let kernel = new Kernel();
+        kernel.bind<IWeapon>("IWeapon").to(Katana);
+        kernel.bind<IWeapon>("IWeapon").to(Shuriken);
+
+        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let objRenderer = makeObjRenderer(loggerOutput);
+        let logger = makeLoggerMiddleware(null, objRenderer);
+        kernel.applyMiddleware(logger);
+
+        let ninja = kernel.get<IWarrior>("IWeapon");
+        expect(ninja).eql(undefined);
+
+        expect(loggerOutput.entry.error).eql(true);
+        expect(loggerOutput.entry.exception.message).eql(`Ambiguous match found for serviceIdentifier: IWeapon`);
+        expect(loggerOutput.entry.time).eql(null);
+        expect(loggerOutput.entry.rootRequest).eql(null);
+
+    });
+
     it("Should be able to log pre-planning errors", () => {
 
         let kernel = new Kernel();
