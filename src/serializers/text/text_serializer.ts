@@ -8,7 +8,9 @@ function textSerializer(entry: ILogEntry) {
     } else {
         textEntry = `${textEntry}\n${green(`SUCCESS: ${entry.time} ms.`)}\n`;
     }
-    textEntry = serializeRequest(textEntry, 0, 0, entry.rootRequest);
+    entry.requests.forEach((request) => {
+        textEntry = serializeRequest(textEntry, 0, 0, request);
+    });
     return textEntry;
 }
 

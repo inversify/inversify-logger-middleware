@@ -43,7 +43,7 @@ describe("makeLoggerMiddleware", () => {
     @injectable()
     class Ninja implements IWarrior {
         private _weapon: IWeapon;
-        public constructor(@inject("IWeapon")  @targetName("shuriken") shuriken: IWeapon) {
+        public constructor(@inject("IWeapon") @targetName("shuriken") shuriken: IWeapon) {
             this._weapon = shuriken;
         }
         public fight() {
@@ -275,7 +275,7 @@ describe("makeLoggerMiddleware", () => {
         expect(loggerOutput.entry.error).eql(false);
         expect(loggerOutput.entry.exception).eql(null);
         expect(typeof loggerOutput.entry.time).eql("string");
-        expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("IWarrior");
+        expect(loggerOutput.entry.requests[0].serviceIdentifier).eql("IWarrior");
 
     });
 /*

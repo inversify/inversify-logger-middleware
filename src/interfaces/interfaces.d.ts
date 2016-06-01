@@ -36,6 +36,10 @@ interface ITargetLoggerSettings {
 interface ILogEntry {
     error: boolean;
     exception: any;
-    rootRequest: any;
+    multiInject: boolean;
+    requests: any[];
+    results: any[];
+    serviceIdentifier: any;
+    target: any;
     time: string;
 }
