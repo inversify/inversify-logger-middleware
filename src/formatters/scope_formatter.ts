@@ -1,5 +1,3 @@
-/// <reference path="../interfaces/interfaces.d.ts" />
-
 function scopeFormatter(scope: number) {
     switch (scope) {
         case 1:

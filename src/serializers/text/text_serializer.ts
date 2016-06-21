@@ -1,7 +1,8 @@
 import serializeRequest from "./request_serializer";
 import { green, red } from "./text_serializer_utils";
+import interfaces from "../../interfaces/interfaces";
 
-function textSerializer(entry: ILogEntry) {
+function textSerializer(entry: interfaces.LogEntry) {
     let textEntry = "";
     if (entry.error) {
         textEntry = `${textEntry}\n${red(`\nERROR: ${entry.exception.message}\n${entry.exception.stack}`)}\n`;

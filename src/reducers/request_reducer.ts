@@ -1,9 +1,10 @@
 import bindingReducer from "./binding_reducer";
 import targetReducer from "./target_reducer";
+import interfaces from "../interfaces/interfaces";
 
 function requestReducer(
-    request: inversify.IRequest,
-    options: IRequestLoggerSettings
+    request: inversify.interfaces.Request,
+    options: interfaces.RequestLoggerSettings
 ) {
 
     let reducedRequest: any = {};
@@ -15,7 +16,7 @@ function requestReducer(
 
     // bindings
     if (requestOptions.bindings !== undefined) {
-        let reducedBindings = request.bindings.map((binding: inversify.IBinding<any>) => {
+        let reducedBindings = request.bindings.map((binding: inversify.interfaces.Binding<any>) => {
             return bindingReducer(binding, options.bindings);
         });
         reducedRequest.bindings = reducedBindings;

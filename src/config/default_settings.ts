@@ -1,6 +1,6 @@
-/// <reference path="../interfaces/interfaces.d.ts" />
+import interfaces from "../interfaces/interfaces";
 
-let deatultOptions: ILoggerSettings = {
+let deatultOptions: interfaces.LoggerSettings = {
     request: {
         bindings: {
             activated: false,

@@ -1,6 +1,8 @@
+import interfaces from "../interfaces/interfaces";
+
 function targetReducer(
-    target: inversify.ITarget,
-    options: ITargetLoggerSettings
+    target: inversify.interfaces.Target,
+    options: interfaces.TargetLoggerSettings
 ) {
 
 
@@ -17,7 +19,7 @@ function targetReducer(
     }
 
     if (targetOptions.metadata && Array.isArray(target.metadata)) {
-        let reducedMetadata = target.metadata.map((m: inversify.IMetadata, i: number) => {
+        let reducedMetadata = target.metadata.map((m: inversify.interfaces.Metadata, i: number) => {
             return {
                 key: m.key,
                 value: m.value
