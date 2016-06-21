@@ -19,7 +19,8 @@ A console logger middleware for [InversifyJS](https://github.com/inversify/Inver
 ### Installation
 You can install `inversify-logger-middleware` using npm:
 ```
-$ npm install inversify reflect-metadata inversify-logger-middleware inversify-dts
+$ npm install inversify reflect-metadata inversify-logger-middleware
+$ npm install inversify-dts --save-dev
 ```
 if you are workiong with TypeScript you will need the following .d.ts files:
 ```
@@ -29,65 +30,51 @@ if you are workiong with TypeScript you will need the following .d.ts files:
 ### Motivation
 Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
 ```ts
-kernel.bind<IWeapon>("IWeapon").to(Katana).whenInjectedInto(Samurai);
-kernel.bind<IWeapon>("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
-kernel.bind<IWarrior>("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
-kernel.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
+let module = new KernelModule((bind: inversify.interfaces.Bind) => {
+    bind<Weapon>("Weapon").to(Katana).whenInjectedInto(Samurai);
+    bind<Weapon>("Weapon").to(Shuriken).whenInjectedInto(Ninja);
+    bind<Warrior>("Warrior").to(Samurai).whenTargetTagged("canSneak", false);
+    bind<Warrior>("Warrior").to(Ninja).whenTargetTagged("canSneak", true);
+});
 ```
 This middleware will display the InversifyJS resolution plan in console in the following format.
 
 ```ts
-// kernel.getTagged<IWarrior>("IWarrior", "canSneak", false);
+//  kernel.getTagged<Warrior>("Warrior", "canSneak", true);
 
-└── plan
-    └── item : 0
-        └── serviceIdentifier : IWarrior
+SUCCESS: 0.41 ms.
+    └── Request : 0
+        └── serviceIdentifier : Warrior
         └── bindings
-            └── item : 0
+            └── Binding<Warrior> : 0
                 └── type : Instance
-                └── serviceIdentifier : IWarrior
-                └── implementationType : Samurai
-                └── activated : false
-                └── cache : null
-                └── dynamicValue : null
-                └── factory : null
-                └── onActivation : null
-                └── provider : null
+                └── implementationType : Ninja
                 └── scope : Transient
         └── target
+            └── serviceIdentifier : Warrior
             └── name : undefined
-            └── serviceIdentifier : IWarrior
             └── metadata
-                └── item : 0
+                └── Metadata : 0
                     └── key : canSneak
-                    └── value : false
+                    └── value : true
         └── childRequests
-            └── item : 0
-                └── serviceIdentifier : IWeapon
+            └── Request : 0
+                └── serviceIdentifier : Weapon
                 └── bindings
-                    └── item : 0
+                    └── Binding<Weapon> : 0
                         └── type : Instance
-                        └── serviceIdentifier : IWeapon
-                        └── implementationType : Katana
-                        └── activated : false
-                        └── cache : null
-                        └── dynamicValue : null
-                        └── factory : null
-                        └── onActivation : null
-                        └── provider : null
+                        └── implementationType : Shuriken
                         └── scope : Transient
                 └── target
-                    └── name : katana
-                    └── serviceIdentifier : IWeapon
+                    └── serviceIdentifier : Weapon
+                    └── name : shuriken
                     └── metadata
-                        └── item : 0
+                        └── Metadata : 0
                             └── key : name
-                            └── value : katana
-                        └── item : 1
+                            └── value : shuriken
+                        └── Metadata : 1
                             └── key : inject
-                            └── value : IWeapon
-
- Time: 0.08 millisecond/s.
+                            └── value : Weapon
 ```
 
 You can configure which elements of the resolution plan are being desplayed.

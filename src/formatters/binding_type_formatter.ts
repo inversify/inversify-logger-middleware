@@ -1,5 +1,3 @@
-/// <reference path="../interfaces/interfaces.d.ts" />
-
 function bindingTypeFormatter(type: number) {
     switch (type) {
         case 1:

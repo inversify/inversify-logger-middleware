@@ -1,8 +1,7 @@
-/// <reference path="../interfaces/interfaces.d.ts" />
-
+import interfaces from "../interfaces/interfaces";
 import textSerializer from "../serializers/text/text_serializer";
 
-function consoleRenderer(entry: ILogEntry) {
+function consoleRenderer(entry: interfaces.LogEntry) {
     return textSerializer(entry);
 }
 

@@ -1,6 +1,8 @@
+import interfaces from "../interfaces/interfaces";
+
 function bindingReducer(
-    binding: inversify.IBinding<any>,
-    options: IBindingLoggerSettings
+    binding: inversify.interfaces.Binding<any>,
+    options: interfaces.BindingLoggerSettings
 ) {
 
     let props = [

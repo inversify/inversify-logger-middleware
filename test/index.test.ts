@@ -1,5 +1,6 @@
-import { Kernel, inject, injectable, targetName, multiInject } from "inversify";
+import { Kernel, inject, injectable, targetName, multiInject, KernelModule } from "inversify";
 import { makeLoggerMiddleware, textSerializer } from "../src/index";
+import interfaces from "../src/interfaces/interfaces";
 import { expect } from "chai";
 import "reflect-metadata";
 import * as sinon from "sinon";
@@ -16,16 +17,16 @@ describe("makeLoggerMiddleware", () => {
         sandbox.restore();
     });
 
-    interface IWeapon {
+    interface Weapon {
         name: string;
     }
 
-    interface IWarrior {
+    interface Warrior {
         fight(): string;
     }
 
     @injectable()
-    class Katana implements IWeapon {
+    class Katana implements Weapon {
         public name: string;
         public constructor() {
             this.name = "Katana";
@@ -33,7 +34,7 @@ describe("makeLoggerMiddleware", () => {
     }
 
     @injectable()
-    class Shuriken implements IWeapon {
+    class Shuriken implements Weapon {
         public name: string;
         public constructor() {
             this.name = "Shuriken";
@@ -41,9 +42,9 @@ describe("makeLoggerMiddleware", () => {
     }
 
     @injectable()
-    class Ninja implements IWarrior {
-        private _weapon: IWeapon;
-        public constructor(@inject("IWeapon") @targetName("shuriken") shuriken: IWeapon) {
+    class Ninja implements Warrior {
+        private _weapon: Weapon;
+        public constructor(@inject("Weapon") @targetName("shuriken") shuriken: Weapon) {
             this._weapon = shuriken;
         }
         public fight() {
@@ -55,9 +56,9 @@ describe("makeLoggerMiddleware", () => {
     }
 
     @injectable()
-    class Samurai implements IWarrior {
-        private _weapon: IWeapon;
-        public constructor(@inject("IWeapon") @targetName("katana") katana: IWeapon) {
+    class Samurai implements Warrior {
+        private _weapon: Weapon;
+        public constructor(@inject("Weapon") @targetName("katana") katana: Weapon) {
             this._weapon = katana;
         }
         public fight() {
@@ -68,26 +69,26 @@ describe("makeLoggerMiddleware", () => {
         }
     }
 
-    let module = (k: inversify.IKernel) => {
-        k.bind<IWeapon>("IWeapon").to(Katana).whenInjectedInto(Samurai);
-        k.bind<IWeapon>("IWeapon").to(Shuriken).whenInjectedInto(Ninja);
-        k.bind<IWarrior>("IWarrior").to(Samurai).whenTargetTagged("canSneak", false);
-        k.bind<IWarrior>("IWarrior").to(Ninja).whenTargetTagged("canSneak", true);
-    };
+    let module = new KernelModule((bind: inversify.interfaces.Bind) => {
+        bind<Weapon>("Weapon").to(Katana).whenInjectedInto(Samurai);
+        bind<Weapon>("Weapon").to(Shuriken).whenInjectedInto(Ninja);
+        bind<Warrior>("Warrior").to(Samurai).whenTargetTagged("canSneak", false);
+        bind<Warrior>("Warrior").to(Ninja).whenTargetTagged("canSneak", true);
+    });
 
-    interface ILoggerOutput<T> {
+    interface LoggerOutput<T> {
         entry: T;
     }
 
     // Takes object (loggerOutput) instead of primitive (string) to share reference
-    let makeStringRenderer = function (loggerOutput: ILoggerOutput<string>) {
-        return function (entry: ILogEntry) {
+    let makeStringRenderer = function (loggerOutput: LoggerOutput<string>) {
+        return function (entry: interfaces.LogEntry) {
             loggerOutput.entry = textSerializer(entry);
         };
     };
 
-    let makeObjRenderer = function (loggerOutput: ILoggerOutput<any>) {
-        return function (entry: ILogEntry) {
+    let makeObjRenderer = function (loggerOutput: LoggerOutput<any>) {
+        return function (entry:  interfaces.LogEntry) {
             loggerOutput.entry = entry;
         };
     };
@@ -97,47 +98,47 @@ describe("makeLoggerMiddleware", () => {
         let kernel = new Kernel();
         kernel.load(module);
 
-        let loggerOutput: ILoggerOutput<string> = { entry: null };
+        let loggerOutput: LoggerOutput<string> = { entry: null };
         let stringRenderer = makeStringRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, stringRenderer);
         kernel.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
+        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
         let expectedLogEntry =  "SUCCESS: 0.41 ms.\n" +
-                                "    └── IRequest : 0\n" +
-                                "        └── serviceIdentifier : IWarrior\n" +
+                                "    └── Request : 0\n" +
+                                "        └── serviceIdentifier : Warrior\n" +
                                 "        └── bindings\n" +
-                                "            └── IBinding<IWarrior> : 0\n" +
+                                "            └── Binding<Warrior> : 0\n" +
                                 "                └── type : Instance\n" +
                                 "                └── implementationType : Ninja\n" +
                                 "                └── scope : Transient\n" +
                                 "        └── target\n" +
-                                "            └── serviceIdentifier : IWarrior\n" +
+                                "            └── serviceIdentifier : Warrior\n" +
                                 "            └── name : undefined\n" +
                                 "            └── metadata\n" +
-                                "                └── IMetadata : 0\n" +
+                                "                └── Metadata : 0\n" +
                                 "                    └── key : canSneak\n" +
                                 "                    └── value : true\n" +
                                 "        └── childRequests\n" +
-                                "            └── IRequest : 0\n" +
-                                "                └── serviceIdentifier : IWeapon\n" +
+                                "            └── Request : 0\n" +
+                                "                └── serviceIdentifier : Weapon\n" +
                                 "                └── bindings\n" +
-                                "                    └── IBinding<IWeapon> : 0\n" +
+                                "                    └── Binding<Weapon> : 0\n" +
                                 "                        └── type : Instance\n" +
                                 "                        └── implementationType : Shuriken\n" +
                                 "                        └── scope : Transient\n" +
                                 "                └── target\n" +
-                                "                    └── serviceIdentifier : IWeapon\n" +
+                                "                    └── serviceIdentifier : Weapon\n" +
                                 "                    └── name : shuriken\n" +
                                 "                    └── metadata\n" +
-                                "                        └── IMetadata : 0\n" +
+                                "                        └── Metadata : 0\n" +
                                 "                            └── key : name\n" +
                                 "                            └── value : shuriken\n" +
-                                "                        └── IMetadata : 1\n" +
+                                "                        └── Metadata : 1\n" +
                                 "                            └── key : inject\n" +
-                                "                            └── value : IWeapon\n";
+                                "                            └── value : Weapon\n";
 
         let lines = loggerOutput.entry.split("└── ")
                                 .map((line) => {
@@ -162,7 +163,7 @@ describe("makeLoggerMiddleware", () => {
         let kernel = new Kernel();
         kernel.load(module);
 
-        let options: ILoggerSettings = {
+        let options: interfaces.LoggerSettings = {
             request: {
                 bindings: {
                     activated: true,
@@ -188,12 +189,12 @@ describe("makeLoggerMiddleware", () => {
         };
 
         let expectedLogEntry =  "SUCCESS: 0.77 ms.\n" +
-                                "    └── IRequest : 0\n" +
-                                "        └── serviceIdentifier : IWarrior\n" +
+                                "    └── Request : 0\n" +
+                                "        └── serviceIdentifier : Warrior\n" +
                                 "        └── bindings\n" +
-                                "            └── IBinding<IWarrior> : 0\n" +
+                                "            └── Binding<Warrior> : 0\n" +
                                 "                └── type : Instance\n" +
-                                "                └── serviceIdentifier : IWarrior\n" +
+                                "                └── serviceIdentifier : Warrior\n" +
                                 "                └── implementationType : Ninja\n" +
                                 "                └── activated : false\n" +
                                 "                └── cache : null\n" +
@@ -202,19 +203,19 @@ describe("makeLoggerMiddleware", () => {
                                 "                └── provider : null\n" +
                                 "                └── scope : Transient\n" +
                                 "        └── target\n" +
-                                "            └── serviceIdentifier : IWarrior\n" +
+                                "            └── serviceIdentifier : Warrior\n" +
                                 "            └── name : undefined\n" +
                                 "            └── metadata\n" +
-                                "                └── IMetadata : 0\n" +
+                                "                └── Metadata : 0\n" +
                                 "                    └── key : canSneak\n" +
                                 "                    └── value : true\n" +
                                 "        └── childRequests\n" +
-                                "            └── IRequest : 0\n" +
-                                "                └── serviceIdentifier : IWeapon\n" +
+                                "            └── Request : 0\n" +
+                                "                └── serviceIdentifier : Weapon\n" +
                                 "                └── bindings\n" +
-                                "                    └── IBinding<IWeapon> : 0\n" +
+                                "                    └── Binding<Weapon> : 0\n" +
                                 "                        └── type : Instance\n" +
-                                "                        └── serviceIdentifier : IWeapon\n" +
+                                "                        └── serviceIdentifier : Weapon\n" +
                                 "                        └── implementationType : Shuriken\n" +
                                 "                        └── activated : false\n" +
                                 "                        └── cache : null\n" +
@@ -223,22 +224,22 @@ describe("makeLoggerMiddleware", () => {
                                 "                        └── provider : null\n" +
                                 "                        └── scope : Transient\n" +
                                 "                └── target\n" +
-                                "                    └── serviceIdentifier : IWeapon\n" +
+                                "                    └── serviceIdentifier : Weapon\n" +
                                 "                    └── name : shuriken\n" +
                                 "                    └── metadata\n" +
-                                "                        └── IMetadata : 0\n" +
+                                "                        └── Metadata : 0\n" +
                                 "                            └── key : name\n" +
                                 "                            └── value : shuriken\n" +
-                                "                        └── IMetadata : 1\n" +
+                                "                        └── Metadata : 1\n" +
                                 "                            └── key : inject\n" +
-                                "                            └── value : IWeapon\n";
+                                "                            └── value : Weapon\n";
 
-        let loggerOutput: ILoggerOutput<string> = { entry: null };
+        let loggerOutput: LoggerOutput<string> = { entry: null };
         let stringRenderer = makeStringRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(options, stringRenderer);
         kernel.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
+        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
         let lines = loggerOutput.entry.split("└── ")
@@ -264,37 +265,37 @@ describe("makeLoggerMiddleware", () => {
         let kernel = new Kernel();
         kernel.load(module);
 
-        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
         kernel.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<IWarrior>("IWarrior", "canSneak", true);
+        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
         expect(loggerOutput.entry.error).eql(false);
         expect(loggerOutput.entry.exception).eql(null);
         expect(typeof loggerOutput.entry.time).eql("string");
-        expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("IWarrior");
+        expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("Warrior");
 
     });
 
     it("Should be able to log planning errors", () => {
 
         let kernel = new Kernel();
-        kernel.bind<IWeapon>("IWeapon").to(Katana);
-        kernel.bind<IWeapon>("IWeapon").to(Shuriken);
+        kernel.bind<Weapon>("Weapon").to(Katana);
+        kernel.bind<Weapon>("Weapon").to(Shuriken);
 
-        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
         kernel.applyMiddleware(logger);
 
-        let ninja = kernel.get<IWarrior>("IWeapon");
+        let ninja = kernel.get<Warrior>("Weapon");
         expect(ninja).eql(undefined);
 
         expect(loggerOutput.entry.error).eql(true);
-        expect(loggerOutput.entry.exception.message).eql(`Ambiguous match found for serviceIdentifier: IWeapon`);
+        expect(loggerOutput.entry.exception.message).eql(`Ambiguous match found for serviceIdentifier: Weapon`);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
 
@@ -305,12 +306,12 @@ describe("makeLoggerMiddleware", () => {
         let kernel = new Kernel();
         kernel.load(module);
 
-        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
         kernel.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<IWarrior>("WRONG_ID", "canSneak", true);
+        let ninja = kernel.getTagged<Warrior>("WRONG_ID", "canSneak", true);
         expect(ninja).eql(undefined);
 
         expect(loggerOutput.entry.error).eql(true);
@@ -324,17 +325,17 @@ describe("makeLoggerMiddleware", () => {
 
         let kernel = new Kernel();
         kernel.load(module);
-        kernel.unbind("IWarrior");
+        kernel.unbind("Warrior");
 
         @injectable()
-        class SamuraiNinja implements IWarrior {
-            private _weapons: IWeapon[];
-            public constructor(@multiInject("IWeapon") weapons: IWeapon[]) {
+        class SamuraiNinja implements Warrior {
+            private _weapons: Weapon[];
+            public constructor(@multiInject("Weapon") weapons: Weapon[]) {
                 this._weapons = weapons;
             }
             public fight() {
                 let s = "";
-                this._weapons.forEach((w: IWeapon) => { s = s + " " + w.name; });
+                this._weapons.forEach((w: Weapon) => { s = s + " " + w.name; });
                 return s.trim();
             }
             public speak() {
@@ -342,14 +343,14 @@ describe("makeLoggerMiddleware", () => {
             }
         }
 
-        kernel.bind<IWarrior>("IWarrior").to(SamuraiNinja);
+        kernel.bind<Warrior>("Warrior").to(SamuraiNinja);
 
-        let loggerOutput: ILoggerOutput<ILogEntry> = { entry: null };
+        let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
         kernel.applyMiddleware(logger);
 
-        let samuraiNinja = kernel.get<IWarrior>("IWarrior");
+        let samuraiNinja = kernel.get<Warrior>("Warrior");
         expect(samuraiNinja.fight()).eql("Katana Shuriken");
         expect(loggerOutput.entry.error).eql(false);
         expect(typeof loggerOutput.entry.time).eql("string");
