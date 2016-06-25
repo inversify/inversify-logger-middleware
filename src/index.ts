@@ -3,6 +3,7 @@ import consoleRenderer from "./renderers/console_renderer";
 import requestReducer from "./reducers/request_reducer";
 import textSerializer from "./serializers/text/text_serializer";
 import interfaces from "./interfaces/interfaces";
+import { guid } from "./utils/utils";
 import { getTime, getTimeDiference } from "./utils/utils";
 
 function makeLoggerMiddleware(
@@ -24,6 +25,7 @@ function makeLoggerMiddleware(
             let logEntry: interfaces.LogEntry = {
                 error: false,
                 exception: null,
+                guid: guid(),
                 multiInject: args.multiInject,
                 results: [],
                 rootRequest: null,
@@ -33,6 +35,7 @@ function makeLoggerMiddleware(
             };
 
             let nextContextInterceptor = args.contextInterceptor;
+
             args.contextInterceptor = (context: inversify.interfaces.Context) => {
                 logEntry.rootRequest = requestReducer(context.plan.rootRequest, settings.request);
                 return nextContextInterceptor(context);

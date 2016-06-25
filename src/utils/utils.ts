@@ -24,10 +24,20 @@ function getTime() {
 
 }
 
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + "-" + s4() + "-" + s4() + "-" +
+    s4() + "-" + s4() + s4() + s4();
+}
+
 function getTimeDiference( start: number, end: number) {
     let diff = end - start;
     let formatted = diff.toFixed(2);
     return formatted;
 }
 
-export { getTime, getTimeDiference };
+export { getTime, getTimeDiference, guid };
