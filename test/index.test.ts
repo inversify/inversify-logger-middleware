@@ -276,6 +276,8 @@ describe("makeLoggerMiddleware", () => {
         expect(loggerOutput.entry.error).eql(false);
         expect(loggerOutput.entry.exception).eql(null);
         expect(typeof loggerOutput.entry.time).eql("string");
+        expect(typeof loggerOutput.entry.guid).eql("string");
+        expect(loggerOutput.entry.guid.length).eql(36);
         expect(loggerOutput.entry.rootRequest.serviceIdentifier).eql("Warrior");
 
     });

@@ -27,6 +27,9 @@ if you are workiong with TypeScript you will need the following .d.ts files:
 /// <reference path="node_modules/inversify-dts/inversify-logger-middleware/inversify-logger-middleware.d.ts" />
 /// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
 ```
+
+Please refer to the [InversifyJS installation guide](https://github.com/inversify/InversifyJS#installation) for more details.
+
 ### Motivation
 Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
 ```ts
