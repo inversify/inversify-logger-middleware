@@ -11,9 +11,10 @@ function bindingTypeFormatter(type: number) {
         case 5:
             return "Factory";
         case 6:
+            return "Function";
+        case 7:
             return "Provider";
         case 0:
-        default:
             return "Invalid";
     }
 }
