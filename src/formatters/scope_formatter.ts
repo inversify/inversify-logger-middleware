@@ -3,7 +3,6 @@ function scopeFormatter(scope: number) {
         case 1:
             return "Singleton";
         case 0:
-        default:
             return "Transient";
     }
 }
