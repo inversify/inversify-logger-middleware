@@ -5,6 +5,8 @@ import textSerializer from "./serializers/text/text_serializer";
 import interfaces from "./interfaces/interfaces";
 import { guid } from "./utils/utils";
 import { getTime, getTimeDiference } from "./utils/utils";
+import bindingTypeFormatter from "./formatters/binding_type_formatter";
+import scopeFormatter from "./formatters/scope_formatter";
 
 function makeLoggerMiddleware(
     settings?: interfaces.LoggerSettings,
@@ -63,4 +65,4 @@ function makeLoggerMiddleware(
 
 }
 
-export { makeLoggerMiddleware, textSerializer };
+export { makeLoggerMiddleware, textSerializer, bindingTypeFormatter scopeFormatter };
