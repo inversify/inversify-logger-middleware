@@ -65,4 +65,4 @@ function makeLoggerMiddleware(
 
 }
 
-export { makeLoggerMiddleware, textSerializer, bindingTypeFormatter scopeFormatter };
+export { makeLoggerMiddleware, textSerializer, bindingTypeFormatter, scopeFormatter };
