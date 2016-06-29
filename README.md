@@ -88,13 +88,14 @@ This kind of information can help you during the development of applications wit
 You can create a logger using the default settings as follows:
 
 ```ts
+import { makeLoggerMiddleware } from 'inversify-logger-middleware';
 let logger = makeLoggerMiddleware();
 ```
 
 The default options are the following:
 
 ```ts
-let deatultOptions: ILoggerSettings = {
+let deatultOptions: LoggerSettings = {
     request: {
         bindings: {
             activated: false,
@@ -135,7 +136,7 @@ function consoleRenderer(out: string) {
 The following code snippet uses custom settings and a string renderer instead of the default console renderer.
 
 ```ts
-let options: ILoggerSettings = {
+let options: LoggerSettings = {
     request: {
         serviceIdentifier: true,
         bindings: {
