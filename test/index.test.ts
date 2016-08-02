@@ -297,7 +297,8 @@ describe("makeLoggerMiddleware", () => {
         expect(ninja).eql(undefined);
 
         expect(loggerOutput.entry.error).eql(true);
-        expect(loggerOutput.entry.exception.message).eql(`Ambiguous match found for serviceIdentifier: Weapon`);
+        let msg = "Ambiguous match found for serviceIdentifier: Weapon\nRegistered bindings:\n Katana\n Shuriken";
+        expect(loggerOutput.entry.exception.message).eql(msg);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
 
@@ -317,6 +318,7 @@ describe("makeLoggerMiddleware", () => {
         expect(ninja).eql(undefined);
 
         expect(loggerOutput.entry.error).eql(true);
+        let msg = "No bindings found for serviceIdentifier: WRONG_ID\n WRONG_ID - tagged: { key:canSneak, value: true }";
         expect(loggerOutput.entry.exception.message).eql(`No bindings found for serviceIdentifier: WRONG_ID`);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
