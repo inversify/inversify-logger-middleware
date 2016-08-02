@@ -319,7 +319,7 @@ describe("makeLoggerMiddleware", () => {
 
         expect(loggerOutput.entry.error).eql(true);
         let msg = "No bindings found for serviceIdentifier: WRONG_ID\n WRONG_ID - tagged: { key:canSneak, value: true }";
-        expect(loggerOutput.entry.exception.message).eql(`No bindings found for serviceIdentifier: WRONG_ID`);
+        expect(loggerOutput.entry.exception.message).eql(msg);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
 
