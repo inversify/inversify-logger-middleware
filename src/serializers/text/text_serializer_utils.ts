@@ -1,14 +1,10 @@
-import * as chalk from "chalk";
+import { yellow, green, red } from "chalk";
 
 let tree = {
     item: "└──"
 };
 
 let indentationStr  = "    ";
-
-let yellow  = chalk.yellow;
-let green  = chalk.green;
-let red  = chalk.red;
 
 function getIndentationForDepth(depth: number) {
     let indentationForDepth = indentationStr;
