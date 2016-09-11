@@ -1,8 +1,9 @@
+import { interfaces } from "inversify";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
 import serializeBinding from "./binding_serializer";
 import serializeTarget from "./target_serializer";
 
-function serializeRequest(textEntry: string, depth: number, index: number, request: inversify.interfaces.Request) {
+function serializeRequest(textEntry: string, depth: number, index: number, request: interfaces.Request) {
 
     let indentation = getIndentationForDepth(depth);
     let propertyLogger = makePropertyLogger(indentation);
@@ -16,7 +17,7 @@ function serializeRequest(textEntry: string, depth: number, index: number, reque
     // bindings
     if (request.bindings !== undefined && Array.isArray(request.bindings)) {
         textEntry = propertyLogger(textEntry, 1, "bindings");
-        request.bindings.forEach((binding: inversify.interfaces.Binding<any>, bindingIndex: number) => {
+        request.bindings.forEach((binding: interfaces.Binding<any>, bindingIndex: number) => {
             textEntry = propertyLogger(textEntry, 2, `Binding<${request.serviceIdentifier}>`, bindingIndex.toString());
             textEntry = serializeBinding(textEntry, depth, binding);
         });
@@ -28,7 +29,7 @@ function serializeRequest(textEntry: string, depth: number, index: number, reque
     // child requests
     if (request.childRequests !== undefined && Array.isArray(request.childRequests) && request.childRequests.length > 0) {
         textEntry = propertyLogger(textEntry, 1, "childRequests");
-        request.childRequests.forEach((childRequest: inversify.interfaces.Request, childIndex: number) => {
+        request.childRequests.forEach((childRequest: interfaces.Request, childIndex: number) => {
             textEntry = serializeRequest(textEntry, (depth + 2), childIndex, childRequest);
         });
     }

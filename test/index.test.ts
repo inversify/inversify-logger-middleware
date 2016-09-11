@@ -1,8 +1,10 @@
+import * as inversify from "inversify";
 import { Kernel, inject, injectable, targetName, multiInject, KernelModule } from "inversify";
 import { makeLoggerMiddleware, textSerializer } from "../src/index";
 import interfaces from "../src/interfaces/interfaces";
 import { expect } from "chai";
 import "reflect-metadata";
+import "mocha";
 import * as sinon from "sinon";
 
 describe("makeLoggerMiddleware", () => {

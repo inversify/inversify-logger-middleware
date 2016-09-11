@@ -1,8 +1,9 @@
+import { interfaces } from "inversify";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
 import bindingTypeFormatter from "../../formatters/binding_type_formatter";
 import scopeFormatter from "../../formatters/scope_formatter";
 
-function serializeBinding(textEntry: string, depth: number, binding: inversify.interfaces.Binding<any>) {
+function serializeBinding(textEntry: string, depth: number, binding: interfaces.Binding<any>) {
 
     let indentation = getIndentationForDepth(depth);
     let propertyLogger = makePropertyLogger(indentation);

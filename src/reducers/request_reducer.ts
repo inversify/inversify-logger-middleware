@@ -1,3 +1,4 @@
+import * as inversify from "inversify";
 import bindingReducer from "./binding_reducer";
 import targetReducer from "./target_reducer";
 import interfaces from "../interfaces/interfaces";

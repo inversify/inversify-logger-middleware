@@ -1,3 +1,4 @@
+import * as inversify from "inversify";
 import interfaces from "../interfaces/interfaces";
 
 function bindingReducer(

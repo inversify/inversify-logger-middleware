@@ -1,3 +1,4 @@
+import * as inversify from "inversify";
 import deatultOptions from "./config/default_settings";
 import consoleRenderer from "./renderers/console_renderer";
 import requestReducer from "./reducers/request_reducer";

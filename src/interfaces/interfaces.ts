@@ -1,6 +1,4 @@
-/// <reference path="../../node_modules/inversify-dts/inversify/inversify.d.ts" />
-/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts" />
-/// <reference path="../../typings/index.d.ts" />
+import * as inversify from "inversify";
 
 namespace interfaces {
 
