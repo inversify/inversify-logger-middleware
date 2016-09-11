@@ -16,19 +16,15 @@ A console logger middleware for [InversifyJS](https://github.com/inversify/Inver
 
 ![](http://i.imgur.com/iFAogro.png)
 
-### Installation
+## Installation
 You can install `inversify-logger-middleware` using npm:
+
 ```
-$ npm install inversify reflect-metadata inversify-logger-middleware
-$ npm install inversify-dts --save-dev
-```
-if you are workiong with TypeScript you will need the following .d.ts files:
-```
-/// <reference path="node_modules/inversify-dts/inversify-logger-middleware/inversify-logger-middleware.d.ts" />
-/// <reference path="node_modules/reflect-metadata/reflect-metadata.d.ts" />
+$ npm install inversify inversify-logger-middleware reflect-metadata --save
 ```
 
-Please refer to the [InversifyJS installation guide](https://github.com/inversify/InversifyJS#installation) for more details.
+The `inversify-logger-middleware` type definitions are included in the npm module and require TypeScript 2.0.
+Please refer to the [InversifyJS documentation](https://github.com/inversify/InversifyJS#installation) to learn more about the installation process.
 
 ### Motivation
 Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
