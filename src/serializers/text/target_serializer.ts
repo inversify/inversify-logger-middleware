@@ -1,7 +1,8 @@
+import { interfaces } from "inversify";
 import serializeMetadata from "./metadata_serializer";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
 
-function serializeTarget(textEntry: string, depth: number, target: inversify.interfaces.Target) {
+function serializeTarget(textEntry: string, depth: number, target: interfaces.Target) {
 
     let indentation = getIndentationForDepth(depth);
     let propertyLogger = makePropertyLogger(indentation);
