@@ -1,5 +1,6 @@
 import { interfaces } from "inversify";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
+import serviceIdentifierFormatter from "../../formatters/service_identifier_formatter";
 
 function serializeMetadata(textEntry: string, depth: number, metadatas: interfaces.Metadata[]) {
 
@@ -11,7 +12,7 @@ function serializeMetadata(textEntry: string, depth: number, metadatas: interfac
         metadatas.forEach((metadata: interfaces.Metadata, index: number) => {
             textEntry = propertyLogger(textEntry, 3, "Metadata", index.toString());
             textEntry = propertyLogger(textEntry, 4, "key", metadata.key);
-            textEntry = propertyLogger(textEntry, 4, "value", metadata.value);
+            textEntry = propertyLogger(textEntry, 4, "value", serviceIdentifierFormatter(metadata.value));
         });
     }
 
