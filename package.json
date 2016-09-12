@@ -1,6 +1,6 @@
 {
   "name": "inversify-logger-middleware",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A basic logger middleware for InversifyJS",
   "main": "lib/index.js",
   "typings": "./dts/index.d.ts",
