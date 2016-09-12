@@ -367,4 +367,149 @@ describe("makeLoggerMiddleware", () => {
 
     });
 
+    it("Should display only the name of implementation types", () => {
+
+        @injectable()
+        class MyService {
+            public foo() {
+                return 123;
+            }
+        }
+
+        @injectable()
+        class MyController {
+
+            @inject(MyService) private myService: MyService;
+
+            public bar() {
+                return this.myService.foo();
+            }
+        }
+
+        const kernel = new Kernel();
+        kernel.bind<MyService>(MyService).to(MyService).inSingletonScope();
+        kernel.bind<MyController>(MyController).to(MyController).inSingletonScope();
+
+        let out = "";
+        let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
+        kernel.applyMiddleware(logger);
+        kernel.get<MyController>(MyController);
+
+        let expectedOut =   "SUCCESS: 0.78 ms.\n" +
+                            "└── Request : 0\n" +
+                            "    └── serviceIdentifier : MyController\n" +
+                            "    └── bindings\n" +
+                            "        └── Binding<MyController> : 0\n" +
+                            "            └── type : Instance\n" +
+                            "            └── implementationType : MyController\n" +
+                            "            └── scope : Singleton\n" +
+                            "    └── childRequests\n" +
+                            "        └── Request : 0\n" +
+                            "            └── serviceIdentifier : MyService\n" +
+                            "            └── bindings\n" +
+                            "                └── Binding<MyService> : 0\n" +
+                            "                    └── type : Instance\n" +
+                            "                    └── implementationType : MyService\n" +
+                            "                    └── scope : Singleton\n" +
+                            "            └── target\n" +
+                            "                └── serviceIdentifier : MyService\n" +
+                            "                └── name : myService\n" +
+                            "                └── metadata\n" +
+                            "                    └── Metadata : 0\n" +
+                            "                        └── key : inject\n" +
+                            "                        └── value : MyService\n";
+
+        let lines = out.split("└── ")
+                        .map((line) => {
+                            return line.split("\u001b[33m").join("")
+                                        .split("\u001b[39m").join("");
+                        });
+
+        let expectedLines = expectedOut.split("└── ");
+
+        lines.forEach((line: string, index: number) => {
+            if (index > 0) {
+                expect(line.trim()).eql(expectedLines[index].trim());
+            } else {
+                expect(line.indexOf("SUCCESS")).not.to.eql(-1);
+            }
+        });
+
+    });
+
+    it("Should be able to serialize symbols", () => {
+
+        const TYPES = {
+            MyController: Symbol("MyController"),
+            MyService: Symbol("MyService")
+        };
+
+        @injectable()
+        class MyService {
+            public foo() {
+                return 123;
+            }
+        }
+
+        @injectable()
+        class MyController {
+
+            @inject(TYPES.MyService) private myService: MyService;
+
+            public bar() {
+                return this.myService.foo();
+            }
+        }
+
+        const kernel = new Kernel();
+        kernel.bind<MyService>(TYPES.MyService).to(MyService).inSingletonScope();
+        kernel.bind<MyController>(TYPES.MyController).to(MyController).inSingletonScope();
+
+        let out = "";
+        let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
+        kernel.applyMiddleware(logger);
+        kernel.get<MyController>(TYPES.MyController);
+
+        let expectedOut = "SUCCESS: 1.71 ms.\n" +
+        "    └── Request : 0\n" +
+        "        └── serviceIdentifier : Symbol(MyController)\n" +
+        "        └── bindings\n" +
+        "            └── Binding<Symbol(MyController)> : 0\n" +
+        "                └── type : Instance\n" +
+        "                └── implementationType : MyController\n" +
+        "                └── scope : Singleton\n" +
+        "        └── childRequests\n" +
+        "            └── Request : 0\n" +
+        "                └── serviceIdentifier : Symbol(MyService)\n" +
+        "                └── bindings\n" +
+        "                    └── Binding<Symbol(MyService)> : 0\n" +
+        "                        └── type : Instance\n" +
+        "                        └── implementationType : MyService\n" +
+        "                        └── scope : Singleton\n" +
+        "                └── target\n" +
+        "                    └── serviceIdentifier : Symbol(MyService)\n" +
+        "                    └── name : myService\n" +
+        "                    └── metadata\n" +
+        "                        └── Metadata : 0\n" +
+        "                            └── key : inject\n" +
+        "                            └── value : Symbol(MyService)\n";
+
+        let lines = out.split("└── ")
+                        .map((line) => {
+                            return line.split("\u001b[33m").join("")
+                                        .split("\u001b[39m").join("");
+                        });
+
+        let expectedLines = expectedOut.split("└── ");
+
+        lines.forEach((line: string, index: number) => {
+            if (index > 0) {
+                expect(line.trim()).eql(expectedLines[index].trim());
+            } else {
+                expect(line.indexOf("SUCCESS")).not.to.eql(-1);
+            }
+        });
+
+    });
+
 });
