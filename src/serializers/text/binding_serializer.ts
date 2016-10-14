@@ -30,7 +30,7 @@ function serializeBinding(
                     val = scopeFormatter(_b[prop]);
                     break;
                 case "implementationType":
-                    val = _b[prop].name;
+                    val = _b[prop] && _b[prop].name;
                     break;
                 case "serviceIdentifier":
                     val = serviceIdentifierFormatter(_b[prop]);
