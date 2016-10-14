@@ -20,7 +20,7 @@ function serializeBinding(
     let _b: any = binding;
 
     props.forEach((prop) => {
-        if (_b[prop] !== undefined) {
+        if (_b[prop] !== undefined && _b[prop] !== null) {
             let val: any = _b[prop];
             switch (prop) {
                 case "type":

@@ -512,4 +512,44 @@ describe("makeLoggerMiddleware", () => {
 
     });
 
+    it("Should be able to serialize constant values like strings", () => {
+
+        const TYPES = {
+            MyStringValue: Symbol("MyStringValue")
+        };
+
+        const kernel = new Kernel();
+        kernel.bind<string>(TYPES.MyStringValue).toConstantValue("foo");
+
+        let out = "";
+        let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
+        kernel.applyMiddleware(logger);
+        kernel.get<string>(TYPES.MyStringValue);
+
+        let expectedOut = "SUCCESS: 0.75 ms.\n" +
+        "    └── Request : 0\n" +
+        "        └── serviceIdentifier : Symbol(MyStringValue)\n" +
+        "        └── bindings\n" +
+        "            └── Binding<Symbol(MyStringValue)> : 0\n" +
+        "                └── type : ConstantValue\n" +
+        "                └── scope : Transient\n";
+
+        let lines = out.split("└── ")
+                        .map((line) => {
+                            return line.split("\u001b[33m").join("")
+                                        .split("\u001b[39m").join("");
+                        });
+
+        let expectedLines = expectedOut.split("└── ");
+
+        lines.forEach((line: string, index: number) => {
+            if (index > 0) {
+                expect(line.trim()).eql(expectedLines[index].trim());
+            } else {
+                expect(line.indexOf("SUCCESS")).not.to.eql(-1);
+            }
+        });
+
+    });
+
 });
