@@ -20,7 +20,7 @@ function serializeBinding(
     let _b: any = binding;
 
     props.forEach((prop) => {
-        if (_b[prop] !== undefined && _b[prop] !== null) {
+        if (_b[prop] !== undefined) {
             let val: any = _b[prop];
             switch (prop) {
                 case "type":
@@ -30,7 +30,7 @@ function serializeBinding(
                     val = scopeFormatter(_b[prop]);
                     break;
                 case "implementationType":
-                    val = _b[prop].name;
+                    val = _b[prop] && _b[prop].name;
                     break;
                 case "serviceIdentifier":
                     val = serviceIdentifierFormatter(_b[prop]);

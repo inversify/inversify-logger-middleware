@@ -532,6 +532,7 @@ describe("makeLoggerMiddleware", () => {
         "        └── bindings\n" +
         "            └── Binding<Symbol(MyStringValue)> : 0\n" +
         "                └── type : ConstantValue\n" +
+        "                └── implementationType : null\n" +
         "                └── scope : Transient\n";
 
         let lines = out.split("└── ")
