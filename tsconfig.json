@@ -4,6 +4,7 @@
       "lib": ["es6", "dom"],
       "types": ["chalk"],
       "module": "commonjs",
+      "sourceMap": true,
       "moduleResolution": "node",
       "isolatedModules": false,
       "jsx": "react",
@@ -11,7 +12,10 @@
       "emitDecoratorMetadata": true,
       "noImplicitAny": true,
       "preserveConstEnums": true,
-      "suppressImplicitAnyIndexErrors": true,
-      "outDir": "lib"
+      "suppressImplicitAnyIndexErrors": false,
+      "noResolve": false,
+      "noUnusedParameters": false,
+      "noUnusedLocals": true,
+      "strictNullChecks": false
     }
 }
