@@ -11,5 +11,6 @@
         "**/dist": true,
         "**/docs": true,
 		"type_definitions/**/*.js": true
-	}
+    },
+    "vsicons.presets.angular": false
 }
