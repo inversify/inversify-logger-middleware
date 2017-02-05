@@ -1,18 +1,17 @@
-import { interfaces } from "inversify";
+import { interfaces, getServiceIdentifierAsString } from "inversify";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
-import serviceIdentifierFormatter from "../../formatters/service_identifier_formatter";
 
-function serializeMetadata(textEntry: string, depth: number, metadatas: interfaces.Metadata[]) {
+function serializeMetadata(textEntry: string, depth: number, tags: interfaces.Metadata[]) {
 
     let indentation = getIndentationForDepth(depth);
     let propertyLogger = makePropertyLogger(indentation);
 
-    if (metadatas && Array.isArray(metadatas)) {
+    if (tags && Array.isArray(tags)) {
         textEntry = propertyLogger(textEntry, 2, "metadata");
-        metadatas.forEach((metadata: interfaces.Metadata, index: number) => {
+        tags.forEach((metadata: interfaces.Metadata, index: number) => {
             textEntry = propertyLogger(textEntry, 3, "Metadata", index.toString());
             textEntry = propertyLogger(textEntry, 4, "key", metadata.key);
-            textEntry = propertyLogger(textEntry, 4, "value", serviceIdentifierFormatter(metadata.value));
+            textEntry = propertyLogger(textEntry, 4, "value", getServiceIdentifierAsString(metadata.value));
         });
     }
 

@@ -1,5 +1,5 @@
 import * as inversify from "inversify";
-import { Kernel, inject, injectable, targetName, multiInject, KernelModule } from "inversify";
+import { Container, inject, injectable, targetName, multiInject, ContainerModule } from "inversify";
 import { makeLoggerMiddleware, textSerializer } from "../src/index";
 import interfaces from "../src/interfaces/interfaces";
 import { expect } from "chai";
@@ -71,7 +71,7 @@ describe("makeLoggerMiddleware", () => {
         }
     }
 
-    let module = new KernelModule((bind: inversify.interfaces.Bind) => {
+    let module = new ContainerModule((bind: inversify.interfaces.Bind) => {
         bind<Weapon>("Weapon").to(Katana).whenInjectedInto(Samurai);
         bind<Weapon>("Weapon").to(Shuriken).whenInjectedInto(Ninja);
         bind<Warrior>("Warrior").to(Samurai).whenTargetTagged("canSneak", false);
@@ -97,15 +97,15 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able use default settings", () => {
 
-        let kernel = new Kernel();
-        kernel.load(module);
+        let container = new Container();
+        container.load(module);
 
         let loggerOutput: LoggerOutput<string> = { entry: null };
         let stringRenderer = makeStringRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, stringRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
+        let ninja = container.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
         let expectedLogEntry =  "SUCCESS: 0.41 ms.\n" +
@@ -121,6 +121,9 @@ describe("makeLoggerMiddleware", () => {
                                 "            └── name : undefined\n" +
                                 "            └── metadata\n" +
                                 "                └── Metadata : 0\n" +
+                                "                    └── key : inject\n" +
+                                "                    └── value : Warrior\n" +
+                                "                └── Metadata : 1\n" +
                                 "                    └── key : canSneak\n" +
                                 "                    └── value : true\n" +
                                 "        └── childRequests\n" +
@@ -162,8 +165,8 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able use custom settings", () => {
 
-        let kernel = new Kernel();
-        kernel.load(module);
+        let container = new Container();
+        container.load(module);
 
         let options: interfaces.LoggerSettings = {
             request: {
@@ -200,6 +203,7 @@ describe("makeLoggerMiddleware", () => {
                                 "                └── implementationType : Ninja\n" +
                                 "                └── activated : false\n" +
                                 "                └── cache : null\n" +
+                                "                └── dynamicValue : null\n" +
                                 "                └── factory : null\n" +
                                 "                └── onActivation : null\n" +
                                 "                └── provider : null\n" +
@@ -209,6 +213,9 @@ describe("makeLoggerMiddleware", () => {
                                 "            └── name : undefined\n" +
                                 "            └── metadata\n" +
                                 "                └── Metadata : 0\n" +
+                                "                    └── key : inject\n" +
+                                "                    └── value : Warrior\n" +
+                                "                └── Metadata : 1\n" +
                                 "                    └── key : canSneak\n" +
                                 "                    └── value : true\n" +
                                 "        └── childRequests\n" +
@@ -221,6 +228,7 @@ describe("makeLoggerMiddleware", () => {
                                 "                        └── implementationType : Shuriken\n" +
                                 "                        └── activated : false\n" +
                                 "                        └── cache : null\n" +
+                                "                        └── dynamicValue : null\n" +
                                 "                        └── factory : null\n" +
                                 "                        └── onActivation : null\n" +
                                 "                        └── provider : null\n" +
@@ -239,9 +247,9 @@ describe("makeLoggerMiddleware", () => {
         let loggerOutput: LoggerOutput<string> = { entry: null };
         let stringRenderer = makeStringRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(options, stringRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
+        let ninja = container.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
 
         let lines = loggerOutput.entry.split("└── ")
@@ -264,17 +272,16 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able use a renderer without serialization", () => {
 
-        let kernel = new Kernel();
-        kernel.load(module);
+        let container = new Container();
+        container.load(module);
 
         let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<Warrior>("Warrior", "canSneak", true);
+        let ninja = container.getTagged<Warrior>("Warrior", "canSneak", true);
         expect(ninja.fight()).eql("Shuriken");
-
         expect(loggerOutput.entry.error).eql(false);
         expect(loggerOutput.entry.exception).eql(null);
         expect(typeof loggerOutput.entry.time).eql("string");
@@ -286,20 +293,20 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able to log planning errors", () => {
 
-        let kernel = new Kernel();
-        kernel.bind<Weapon>("Weapon").to(Katana);
-        kernel.bind<Weapon>("Weapon").to(Shuriken);
+        let container = new Container();
+        container.bind<Weapon>("Weapon").to(Katana);
+        container.bind<Weapon>("Weapon").to(Shuriken);
 
         let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let ninja = kernel.get<Warrior>("Weapon");
-        expect(ninja).eql(undefined);
-
-        expect(loggerOutput.entry.error).eql(true);
+        let tryErro = () => container.get<Warrior>("Weapon");
         let msg = "Ambiguous match found for serviceIdentifier: Weapon\nRegistered bindings:\n Katana\n Shuriken";
+
+        expect(tryErro).to.throw(msg);
+        expect(loggerOutput.entry.error).eql(true);
         expect(loggerOutput.entry.exception.message).eql(msg);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
@@ -308,19 +315,18 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able to log pre-planning errors", () => {
 
-        let kernel = new Kernel();
-        kernel.load(module);
+        let container = new Container();
+        container.load(module);
 
         let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let ninja = kernel.getTagged<Warrior>("WRONG_ID", "canSneak", true);
-        expect(ninja).eql(undefined);
-
+        let tryError = () => container.getTagged<Warrior>("WRONG_ID", "canSneak", true);
+        let msg = "No matching bindings found for serviceIdentifier: WRONG_ID\n WRONG_ID - tagged: { key:canSneak, value: true }\n";
+        expect(tryError).to.throw(msg);
         expect(loggerOutput.entry.error).eql(true);
-        let msg = "No bindings found for serviceIdentifier: WRONG_ID\n WRONG_ID - tagged: { key:canSneak, value: true }";
         expect(loggerOutput.entry.exception.message).eql(msg);
         expect(loggerOutput.entry.time).eql(null);
         expect(loggerOutput.entry.rootRequest).eql(null);
@@ -329,14 +335,19 @@ describe("makeLoggerMiddleware", () => {
 
     it("Should be able to log multi-injections", () => {
 
-        let kernel = new Kernel();
-        kernel.load(module);
-        kernel.unbind("Warrior");
+        let TYPES = {
+            Warrior: "Warrior",
+            Weapon: "Weapon"
+        };
+
+        let container = new Container();
+        container.load(module);
+        container.unbind(TYPES.Warrior);
 
         @injectable()
         class SamuraiNinja implements Warrior {
             private _weapons: Weapon[];
-            public constructor(@multiInject("Weapon") weapons: Weapon[]) {
+            public constructor(@multiInject(TYPES.Weapon) weapons: Weapon[]) {
                 this._weapons = weapons;
             }
             public fight() {
@@ -349,14 +360,16 @@ describe("makeLoggerMiddleware", () => {
             }
         }
 
-        kernel.bind<Warrior>("Warrior").to(SamuraiNinja);
+        container.bind<Warrior>(TYPES.Warrior).to(SamuraiNinja);
+        container.bind<Weapon>(TYPES.Weapon).to(Katana);
+        container.bind<Weapon>(TYPES.Weapon).to(Shuriken);
 
         let loggerOutput: LoggerOutput<interfaces.LogEntry> = { entry: null };
         let objRenderer = makeObjRenderer(loggerOutput);
         let logger = makeLoggerMiddleware(null, objRenderer);
-        kernel.applyMiddleware(logger);
+        container.applyMiddleware(logger);
 
-        let samuraiNinja = kernel.get<Warrior>("Warrior");
+        let samuraiNinja = container.get<Warrior>(TYPES.Warrior);
         expect(samuraiNinja.fight()).eql("Katana Shuriken");
         expect(loggerOutput.entry.error).eql(false);
         expect(typeof loggerOutput.entry.time).eql("string");
@@ -386,14 +399,14 @@ describe("makeLoggerMiddleware", () => {
             }
         }
 
-        const kernel = new Kernel();
-        kernel.bind<MyService>(MyService).to(MyService).inSingletonScope();
-        kernel.bind<MyController>(MyController).to(MyController).inSingletonScope();
+        const container = new Container();
+        container.bind<MyService>(MyService).to(MyService).inSingletonScope();
+        container.bind<MyController>(MyController).to(MyController).inSingletonScope();
 
         let out = "";
         let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
-        kernel.applyMiddleware(logger);
-        kernel.get<MyController>(MyController);
+        container.applyMiddleware(logger);
+        container.get<MyController>(MyController);
 
         let expectedOut =   "SUCCESS: 0.78 ms.\n" +
                             "└── Request : 0\n" +
@@ -403,6 +416,13 @@ describe("makeLoggerMiddleware", () => {
                             "            └── type : Instance\n" +
                             "            └── implementationType : MyController\n" +
                             "            └── scope : Singleton\n" +
+                            "    └──  target\n" +
+                            "        └── serviceIdentifier : MyController\n" +
+                            "        └── name : undefined\n" +
+                            "        └── metadata\n" +
+                            "            └── Metadata : 0\n" +
+                            "                └── key : inject\n" +
+                            "                └── value : MyController\n" +
                             "    └── childRequests\n" +
                             "        └── Request : 0\n" +
                             "            └── serviceIdentifier : MyService\n" +
@@ -461,14 +481,14 @@ describe("makeLoggerMiddleware", () => {
             }
         }
 
-        const kernel = new Kernel();
-        kernel.bind<MyService>(TYPES.MyService).to(MyService).inSingletonScope();
-        kernel.bind<MyController>(TYPES.MyController).to(MyController).inSingletonScope();
+        const container = new Container();
+        container.bind<MyService>(TYPES.MyService).to(MyService).inSingletonScope();
+        container.bind<MyController>(TYPES.MyController).to(MyController).inSingletonScope();
 
         let out = "";
         let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
-        kernel.applyMiddleware(logger);
-        kernel.get<MyController>(TYPES.MyController);
+        container.applyMiddleware(logger);
+        container.get<MyController>(TYPES.MyController);
 
         let expectedOut = "SUCCESS: 1.71 ms.\n" +
         "    └── Request : 0\n" +
@@ -478,6 +498,13 @@ describe("makeLoggerMiddleware", () => {
         "                └── type : Instance\n" +
         "                └── implementationType : MyController\n" +
         "                └── scope : Singleton\n" +
+        "        └── target\n" +
+        "            └── serviceIdentifier : Symbol(MyController)\n" +
+        "            └── name : undefined\n" +
+        "            └── metadata\n" +
+        "                └── Metadata : 0\n" +
+        "                    └── key : inject\n" +
+        "                    └── value : Symbol(MyController)\n" +
         "        └── childRequests\n" +
         "            └── Request : 0\n" +
         "                └── serviceIdentifier : Symbol(MyService)\n" +
@@ -518,13 +545,13 @@ describe("makeLoggerMiddleware", () => {
             MyStringValue: Symbol("MyStringValue")
         };
 
-        const kernel = new Kernel();
-        kernel.bind<string>(TYPES.MyStringValue).toConstantValue("foo");
+        const container = new Container();
+        container.bind<string>(TYPES.MyStringValue).toConstantValue("foo");
 
         let out = "";
         let logger = makeLoggerMiddleware(null, (entry) => { out = textSerializer(entry); });
-        kernel.applyMiddleware(logger);
-        kernel.get<string>(TYPES.MyStringValue);
+        container.applyMiddleware(logger);
+        container.get<string>(TYPES.MyStringValue);
 
         let expectedOut = "SUCCESS: 0.75 ms.\n" +
         "    └── Request : 0\n" +
@@ -533,7 +560,14 @@ describe("makeLoggerMiddleware", () => {
         "            └── Binding<Symbol(MyStringValue)> : 0\n" +
         "                └── type : ConstantValue\n" +
         "                └── implementationType : null\n" +
-        "                └── scope : Transient\n";
+        "                └── scope : Transient\n" +
+        "        └── target\n" +
+        "            └── serviceIdentifier : Symbol(MyStringValue)\n" +
+        "            └── name : undefined\n" +
+        "            └── metadata\n" +
+        "            └── Metadata : 0\n" +
+        "                └── key : inject\n" +
+        "                └── value : Symbol(MyStringValue)\n";
 
         let lines = out.split("└── ")
                         .map((line) => {
@@ -550,6 +584,21 @@ describe("makeLoggerMiddleware", () => {
                 expect(line.indexOf("SUCCESS")).not.to.eql(-1);
             }
         });
+
+    });
+
+    it("Should use consoleRenderer as default renderer", () => {
+
+        let logger = makeLoggerMiddleware();
+        const container = new Container();
+        container.applyMiddleware(logger);
+        let tryError = () => container.get("NOT_REGISTERED_ID");
+
+        sandbox.stub(console, "log", (entry: string) => {
+            expect(entry).to.eql("TODO");
+        });
+
+        expect(tryError).to.throw();
 
     });
 

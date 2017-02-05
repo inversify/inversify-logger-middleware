@@ -1,8 +1,7 @@
-import { interfaces } from "inversify";
+import { interfaces, getServiceIdentifierAsString } from "inversify";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
 import serializeBinding from "./binding_serializer";
 import serializeTarget from "./target_serializer";
-import serviceIdentifierFormatter from "../../formatters/service_identifier_formatter";
 
 function serializeRequest(textEntry: string, depth: number, index: number, request: interfaces.Request) {
 
@@ -15,7 +14,7 @@ function serializeRequest(textEntry: string, depth: number, index: number, reque
 
         if (request.serviceIdentifier !== undefined) {
             textEntry = propertyLogger(
-                textEntry, 1, "serviceIdentifier", serviceIdentifierFormatter(request.serviceIdentifier)
+                textEntry, 1, "serviceIdentifier", getServiceIdentifierAsString(request.serviceIdentifier)
             );
         }
 
@@ -24,7 +23,7 @@ function serializeRequest(textEntry: string, depth: number, index: number, reque
             textEntry = propertyLogger(textEntry, 1, "bindings");
             request.bindings.forEach((binding: interfaces.Binding<any>, bindingIndex: number) => {
                 textEntry = propertyLogger(
-                    textEntry, 2, `Binding<${serviceIdentifierFormatter(request.serviceIdentifier)}>`, bindingIndex.toString()
+                    textEntry, 2, `Binding<${getServiceIdentifierAsString(request.serviceIdentifier)}>`, bindingIndex.toString()
                 );
                 textEntry = serializeBinding(textEntry, depth, binding);
             });

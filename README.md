@@ -17,6 +17,7 @@ A console logger middleware for [InversifyJS](https://github.com/inversify/Inver
 ![](http://i.imgur.com/iFAogro.png)
 
 ## Installation
+
 You can install `inversify-logger-middleware` using npm:
 
 ```
@@ -27,19 +28,22 @@ The `inversify-logger-middleware` type definitions are included in the npm modul
 Please refer to the [InversifyJS documentation](https://github.com/inversify/InversifyJS#installation) to learn more about the installation process.
 
 ### Motivation
-Lets imagine that we have already configured an InversifyJS Kernel and the logger middleware using the fillowing bindings:
+
+Lets imagine that we have already configured an InversifyJS Container and the logger middleware using the fillowing bindings:
+
 ```ts
-let module = new KernelModule((bind: inversify.interfaces.Bind) => {
+let module = new ContainerModule((bind: inversify.interfaces.Bind) => {
     bind<Weapon>("Weapon").to(Katana).whenInjectedInto(Samurai);
     bind<Weapon>("Weapon").to(Shuriken).whenInjectedInto(Ninja);
     bind<Warrior>("Warrior").to(Samurai).whenTargetTagged("canSneak", false);
     bind<Warrior>("Warrior").to(Ninja).whenTargetTagged("canSneak", true);
 });
 ```
+
 This middleware will display the InversifyJS resolution plan in console in the following format.
 
 ```ts
-//  kernel.getTagged<Warrior>("Warrior", "canSneak", true);
+//  container.getTagged<Warrior>("Warrior", "canSneak", true);
 
 SUCCESS: 0.41 ms.
     └── Request : 0
@@ -81,6 +85,7 @@ You can configure which elements of the resolution plan are being desplayed.
 This kind of information can help you during the development of applications with InersifyJS.
 
 ### Default settings and renderer
+
 You can create a logger using the default settings as follows:
 
 ```ts
@@ -160,9 +165,9 @@ let logger = makeLoggerMiddleware(null, stringRenderer);
 You can apply the logger middlerare using the InversifyJS API:
 
 ```ts
-let kernel = new Kernel();
+let container = new Container();
 let logger = makeLoggerMiddleware();
-kernel.applyMiddleware(logger);
+container.applyMiddleware(logger);
 ```
 
 Please refere to the 
@@ -170,5 +175,6 @@ Please refere to the
 to learn more about middleware.
 
 ### Demo app
+
 A sample application can be found at the 
 [inversify-code-samples](https://github.com/inversify/inversify-code-samples/tree/master/inversify-binding-decorators) repository.

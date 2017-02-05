@@ -1,7 +1,6 @@
-import { interfaces } from "inversify";
+import { interfaces, getServiceIdentifierAsString } from "inversify";
 import serializeMetadata from "./metadata_serializer";
 import { getIndentationForDepth, makePropertyLogger } from "./text_serializer_utils";
-import serviceIdentifierFormatter from "../../formatters/service_identifier_formatter";
 
 function serializeTarget(textEntry: string, depth: number, target: interfaces.Target) {
 
@@ -14,7 +13,7 @@ function serializeTarget(textEntry: string, depth: number, target: interfaces.Ta
 
         if (target.serviceIdentifier !== undefined) {
             textEntry = propertyLogger(
-                textEntry, 2, "serviceIdentifier", serviceIdentifierFormatter(target.serviceIdentifier)
+                textEntry, 2, "serviceIdentifier", getServiceIdentifierAsString(target.serviceIdentifier)
             );
         }
 

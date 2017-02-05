@@ -115,7 +115,12 @@ gulp.task("mocha", function() {
         .pipe(mocha({
             ui: "bdd"
         }))
-        .pipe(istanbul.writeReports());
+        .pipe(istanbul.writeReports(
+            {
+                dir: "./coverage",
+                reporters: ["lcov", "json", "text", "html"]
+            }
+        ));
 });
 
 gulp.task("istanbul:hook", function() {

@@ -6,8 +6,6 @@ import textSerializer from "./serializers/text/text_serializer";
 import interfaces from "./interfaces/interfaces";
 import { guid } from "./utils/utils";
 import { getTime, getTimeDiference } from "./utils/utils";
-import bindingTypeFormatter from "./formatters/binding_type_formatter";
-import scopeFormatter from "./formatters/scope_formatter";
 
 function makeLoggerMiddleware(
     settings?: interfaces.LoggerSettings,
@@ -15,10 +13,10 @@ function makeLoggerMiddleware(
 ): inversify.interfaces.Middleware {
 
     let logger = function (
-        planAndResolve: inversify.interfaces.PlanAndResolve<any>
-    ): inversify.interfaces.PlanAndResolve<any> {
+        next: inversify.interfaces.Next
+    ): inversify.interfaces.Next {
 
-        return (args: inversify.interfaces.PlanAndResolveArgs) => {
+        return (args: inversify.interfaces.NextArgs) => {
 
             if (settings === undefined || settings === null) { settings = deatultOptions; };
             if (renderer === undefined || renderer === null) { renderer = consoleRenderer; };
@@ -29,11 +27,10 @@ function makeLoggerMiddleware(
                 error: false,
                 exception: null,
                 guid: guid(),
-                multiInject: args.multiInject,
+                multiInject: args.isMultiInject,
                 results: [],
                 rootRequest: null,
                 serviceIdentifier: args.serviceIdentifier,
-                target: args.target,
                 time: null
             };
 
@@ -46,7 +43,7 @@ function makeLoggerMiddleware(
 
             try {
                 let start =  getTime();
-                results = planAndResolve(args);
+                results = next(args);
                 let end = getTime();
                 logEntry.results = results;
                 logEntry.time = (settings.time) ? getTimeDiference(start, end) : null;
@@ -57,7 +54,12 @@ function makeLoggerMiddleware(
             }
 
             renderer(logEntry);
-            return results || [];
+
+            if (results) {
+                return results;
+            } else {
+                throw new Error(logEntry.exception.message);
+            }
 
         };
     };
@@ -66,4 +68,4 @@ function makeLoggerMiddleware(
 
 }
 
-export { makeLoggerMiddleware, textSerializer, bindingTypeFormatter, scopeFormatter };
+export { makeLoggerMiddleware, textSerializer };

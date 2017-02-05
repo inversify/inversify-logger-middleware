@@ -41,7 +41,6 @@ namespace interfaces {
         results: any[];
         rootRequest: inversify.interfaces.Request;
         serviceIdentifier: any;
-        target: any;
         time: string;
     }
 

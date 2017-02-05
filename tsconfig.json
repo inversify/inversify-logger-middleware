@@ -11,6 +11,7 @@
       "emitDecoratorMetadata": true,
       "noImplicitAny": true,
       "preserveConstEnums": true,
+      "noUnusedLocals": true,
       "suppressImplicitAnyIndexErrors": true,
       "outDir": "lib"
     }
