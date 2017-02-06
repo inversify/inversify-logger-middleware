@@ -1,6 +1,7 @@
 import * as inversify from "inversify";
 import { Container, inject, injectable, targetName, multiInject, ContainerModule } from "inversify";
 import { makeLoggerMiddleware, textSerializer } from "../src/index";
+import { getTimeFactory } from "../src/utils/utils";
 import interfaces from "../src/interfaces/interfaces";
 import { expect } from "chai";
 import "reflect-metadata";
@@ -588,17 +589,45 @@ describe("makeLoggerMiddleware", () => {
     });
 
     it("Should use consoleRenderer as default renderer", () => {
-
         let logger = makeLoggerMiddleware();
         const container = new Container();
         container.applyMiddleware(logger);
-        let tryError = () => container.get("NOT_REGISTERED_ID");
-
-        sandbox.stub(console, "log", (entry: string) => {
-            expect(entry).to.eql("TODO");
-        });
-
+        let id = "THIS IS NOT A REAL ERROR IGNORE THIS ERROR IF YOU SEE IT ON THE CI LOGS";
+        let tryError = () => container.get(id);
+        let logSpy = sandbox.spy(console, "log");
         expect(tryError).to.throw();
+        expect(logSpy.firstCall.args[0].indexOf("id")).not.to.eql(-1);
+    });
+
+    it("Should use the correct implementation of performance now", () => {
+
+        let fakeWindow = {
+            performance: {
+                now: () => 1000000
+            }
+        };
+
+        let fakeProcess = {
+            hrtime: () => [2000000]
+        };
+
+        class FakeDate {
+            public getTime() {
+                return 3000000;
+            }
+        }
+
+        // use window if avaialble
+        let getTimePoweredByWindow = getTimeFactory(fakeWindow, null, null);
+        expect(getTimePoweredByWindow()).to.be.eql(fakeWindow.performance.now());
+
+        // use process if available
+        let getTimePoweredByProcess = getTimeFactory(null, fakeProcess, null);
+        expect(getTimePoweredByProcess()).to.be.eql(fakeProcess.hrtime[0] / 1000000);
+
+        // use getTIme if process and window are not available
+        let getTimePoweredByDate = getTimeFactory(null, null, FakeDate);
+        expect(getTimePoweredByDate()).to.be.eql(new FakeDate().getTime());
 
     });
 

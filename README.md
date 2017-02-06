@@ -20,8 +20,8 @@ A console logger middleware for [InversifyJS](https://github.com/inversify/Inver
 
 You can install `inversify-logger-middleware` using npm:
 
-```
-$ npm install inversify inversify-logger-middleware reflect-metadata --save
+```sh
+npm install inversify inversify-logger-middleware reflect-metadata --save
 ```
 
 The `inversify-logger-middleware` type definitions are included in the npm module and require TypeScript 2.0.
@@ -170,11 +170,11 @@ let logger = makeLoggerMiddleware();
 container.applyMiddleware(logger);
 ```
 
-Please refere to the 
-[InversifyJS documentation](https://github.com/inversify/InversifyJS#middleware) 
+Please refere to the
+[InversifyJS documentation](https://github.com/inversify/InversifyJS#middleware)
 to learn more about middleware.
 
 ### Demo app
 
-A sample application can be found at the 
+A sample application can be found at the
 [inversify-code-samples](https://github.com/inversify/inversify-code-samples/tree/master/inversify-binding-decorators) repository.

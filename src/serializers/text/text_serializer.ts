@@ -8,8 +8,8 @@ function textSerializer(entry: interfaces.LogEntry) {
         textEntry = `${textEntry}\n${red(`\nERROR: ${entry.exception.message}\n${entry.exception.stack}`)}\n`;
     } else {
         textEntry = `${textEntry}\n${green(`SUCCESS: ${entry.time} ms.`)}\n`;
+        textEntry = serializeRequest(textEntry, 0, 0, entry.rootRequest);
     }
-    textEntry = serializeRequest(textEntry, 0, 0, entry.rootRequest);
     return textEntry;
 }
 

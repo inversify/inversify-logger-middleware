@@ -1,28 +1,29 @@
-declare var process: any;
-declare var window: any;
+let _global = this;
 
-function getTime() {
+function getTimeFactory(_window: any, _process: any, _date: any) {
+    return () => {
+        if (_window !== undefined && _window !== null) {
 
-    if (typeof window !== "undefined") {
+            // modern browsers
+            return _window.performance.now();
 
-        // modern browsers
-        return window.performance.now();
+        } else if (_process !== undefined && _process !== null) {
 
-    } else if (typeof process !== "undefined") {
+            // node
+            let nanoseconds = _process.hrtime()[1];
+            let milliseconds = nanoseconds / 1000000;
+            return milliseconds;
 
-        // node
-        let nanoseconds = process.hrtime()[1];
-        let milliseconds = nanoseconds / 1000000;
-        return milliseconds;
+        } else {
 
-    } else {
+            // old browsers
+            return new _date().getTime();
 
-        // old browsers
-        return new Date().getTime();
-
-    }
-
+        }
+    };
 }
+
+let getTime = getTimeFactory(_global.window, _global.process, Date);
 
 function guid() {
   function s4() {
@@ -40,4 +41,4 @@ function getTimeDiference( start: number, end: number) {
     return formatted;
 }
 
-export { getTime, getTimeDiference, guid };
+export { getTimeFactory, getTime, getTimeDiference, guid };

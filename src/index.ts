@@ -16,10 +16,10 @@ function makeLoggerMiddleware(
         next: inversify.interfaces.Next
     ): inversify.interfaces.Next {
 
-        return (args: inversify.interfaces.NextArgs) => {
+        if (settings === undefined || settings === null) { settings = deatultOptions; };
+        if (renderer === undefined || renderer === null) { renderer = consoleRenderer; };
 
-            if (settings === undefined || settings === null) { settings = deatultOptions; };
-            if (renderer === undefined || renderer === null) { renderer = consoleRenderer; };
+        return (args: inversify.interfaces.NextArgs) => {
 
             let results: any = null;
 
