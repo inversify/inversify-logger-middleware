@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.0.0",
-    "@types/chalk": "^0.4.28",
+    "@types/chalk": "^2.2.0",
     "@types/mocha": "^2.2.35",
     "@types/sinon": "^2.1.0",
     "chai": "^4.0.0",
