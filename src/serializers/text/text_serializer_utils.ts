@@ -1,4 +1,4 @@
-import { yellow, green, red } from "chalk";
+import { yellow } from "./colors";
 
 let tree = {
     item: "└──"
@@ -38,4 +38,4 @@ function makePropertyLogger(indentationForDepth: string) {
     };
 }
 
-export { getIndentationForDepth, makePropertyLogger, yellow, green, red };
+export { getIndentationForDepth, makePropertyLogger };

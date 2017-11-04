@@ -1,5 +1,5 @@
 import serializeRequest from "./request_serializer";
-import { green, red } from "./text_serializer_utils";
+import { green, red } from "./colors";
 import interfaces from "../../interfaces/interfaces";
 
 function textSerializer(entry: interfaces.LogEntry) {
