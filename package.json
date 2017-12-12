@@ -32,7 +32,7 @@
     "chalk": "2.3.0"
   },
   "devDependencies": {
-    "@types/chai": "4.0.8",
+    "@types/chai": "4.0.9",
     "@types/chalk": "2.2.0",
     "@types/mocha": "2.2.44",
     "@types/sinon": "4.1.1",
