@@ -461,8 +461,8 @@ describe("makeLoggerMiddleware", () => {
     it("Should be able to serialize symbols", () => {
 
         const TYPES = {
-            MyController: Symbol("MyController"),
-            MyService: Symbol("MyService")
+            MyController: Symbol.for("MyController"),
+            MyService: Symbol.for("MyService")
         };
 
         @injectable()
@@ -543,7 +543,7 @@ describe("makeLoggerMiddleware", () => {
     it("Should be able to serialize constant values like strings", () => {
 
         const TYPES = {
-            MyStringValue: Symbol("MyStringValue")
+            MyStringValue: Symbol.for("MyStringValue")
         };
 
         const container = new Container();
