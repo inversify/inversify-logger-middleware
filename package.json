@@ -44,7 +44,7 @@
     "gulp-typescript": "4.0.2",
     "harmonize": "2.0.0",
     "inversify": "4.13.0",
-    "mocha": "5.1.0",
+    "mocha": "5.1.1",
     "publish-please": "2.4.1",
     "reflect-metadata": "0.1.12",
     "run-sequence": "2.2.1",
