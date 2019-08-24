@@ -10,7 +10,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/inversify/inversify-logger-middleware/badge.svg)](https://snyk.io/test/github/inversify/inversify-logger-middleware)
 
 [![NPM](https://nodei.co/npm/inversify-logger-middleware.png?downloads=true&downloadRank=true)](https://nodei.co/npm/inversify-logger-middleware/)
-[![NPM](https://nodei.co/npm-dl/inversify-logger-middleware.png?months=9&height=3)](https://nodei.co/npm/inversify-logger-middleware/)
+[![NPM](https://nodei.co/npm-dl/inversify-logger-middleware.png?months=9&height=3)](https://nodei.co/npm/inversify-logger-middleware/) [![Greenkeeper badge](https://badges.greenkeeper.io/inversify/inversify-logger-middleware.svg)](https://greenkeeper.io/)
 
 A console logger middleware for [InversifyJS](https://github.com/inversify/InversifyJS).
 
