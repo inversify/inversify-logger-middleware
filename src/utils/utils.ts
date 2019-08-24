@@ -1,4 +1,4 @@
-let _global = this;
+let _global: any = this;
 
 function getTimeFactory(_window: any, _process: any, _date: any) {
     return () => {
@@ -23,7 +23,7 @@ function getTimeFactory(_window: any, _process: any, _date: any) {
     };
 }
 
-let getTime = getTimeFactory(_global.window, _global.process, Date);
+let getTime = getTimeFactory(_global.window, _global.process , Date);
 
 function guid() {
   function s4() {
