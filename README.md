@@ -171,7 +171,7 @@ container.applyMiddleware(logger);
 ```
 
 Please refere to the
-[InversifyJS documentation](https://github.com/inversify/InversifyJS#middleware)
+[InversifyJS documentation](https://github.com/inversify/InversifyJS/blob/master/wiki/middleware.md)
 to learn more about middleware.
 
 ### Demo app
