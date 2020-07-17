@@ -1,4 +1,4 @@
-let _global: any = this;
+let _global: any = this || {};
 
 function getTimeFactory(_window: any, _process: any, _date: any) {
     return () => {
