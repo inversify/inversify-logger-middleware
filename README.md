@@ -80,7 +80,7 @@ SUCCESS: 0.41 ms.
                             └── value : Weapon
 ```
 
-You can configure which elements of the resolution plan are being desplayed.
+You can configure which elements of the resolution plan are being displayed.
 
 This kind of information can help you during the development of applications with InersifyJS.
 
